@@ -1,6 +1,6 @@
 # Getting Started (Frontend)
 
-This is the frontend of the **FitSync** Gym Management system, built using the [T3 Stack](https://create.t3.gg/).
+**FitSync** Gym Management system, built using the [T3 Stack](https://create.t3.gg/).
 
 ## 1. Prerequisites
 
