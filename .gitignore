@@ -1,0 +1,92 @@
+# ==============================
+
+# Node.js / Backend
+
+# ==============================
+
+backend/node_modules
+backend/dist
+backend/build
+backend/.cache
+backend/logs
+backend/*.log
+
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+backend/pnpm-debug.log*
+
+# backend environment variables
+
+backend/.env
+backend/.env.local
+backend/.env.development
+backend/.env.production
+
+# ==============================
+
+# Next.js / Frontend
+
+# ==============================
+
+frontend/node_modules
+frontend/.next
+frontend/out
+frontend/build
+frontend/.cache
+
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# frontend environment variables
+
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+
+
+.env
+.env.*
+!.env.example
+
+
+backend/prisma/migrations
+backend/generated/prisma
+
+
+db.sqlite
+db.sqlite-journal
+=
+
+.pnp
+.pnp.js
+
+
+next-env.d.ts
+
+
+.vercel
+
+logs
+*.log
+
+.cache
+tmp
+temp
+
+*.tsbuildinfo
+
+.vscode
+.idea
+*.swp
+*.swo
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+*.pem
