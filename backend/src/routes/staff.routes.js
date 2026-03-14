@@ -1,0 +1,10 @@
+const { Router } = require("express");
+const { getStaff, createStaff, getStaffPermissions, updateStaffPermissions } = require("../controllers/staff.controller");
+const { authenticate, requireAdmin } = require("../middleware/auth.middleware");
+const router = Router();
+router.use(authenticate, requireAdmin);
+router.get("/", getStaff);
+router.post("/", createStaff);
+router.get("/:id/permissions", getStaffPermissions);
+router.patch("/:id/permissions", updateStaffPermissions);
+module.exports = router;
