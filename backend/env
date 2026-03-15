@@ -1,3 +1,3 @@
 DATABASE_URL="postgresql://postgres:15801234@localhost:5432/fitsync_db"
-JWT_SECRET="8a837017bab57db93b4bbd84417f10c2b7c5ece57b49a05d974f48fb68185fe3"
+JWT_SECRET="your_secret_jwt_here"
 NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
