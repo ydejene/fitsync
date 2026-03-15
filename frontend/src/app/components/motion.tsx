@@ -51,3 +51,17 @@ export function StaggerContainer({
     </motion.div>
   );
 }
+
+export function StaggerItem({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <motion.div variants={fadeUp} transition={{ duration: 0.45, ease: "easeOut" }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
