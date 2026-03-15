@@ -1,0 +1,11 @@
+const { Router } = require("express");
+const { getMembers, getMemberById, createMember, updateMember, deactivateMember } = require("../controllers/member.controller");
+const { authenticate, requireAdminOrStaff } = require("../middleware/auth.middleware");
+const router = Router();
+router.use(authenticate, requireAdminOrStaff);
+router.get("/", getMembers);
+router.get("/:id", getMemberById);
+router.post("/", createMember);
+router.patch("/:id", updateMember);
+router.delete("/:id", deactivateMember);
+module.exports = router;
