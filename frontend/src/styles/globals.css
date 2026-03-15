@@ -59,3 +59,18 @@
     @apply w-full px-4 py-2.5 bg-white border border-border-base rounded-lg text-sm text-text-primary
            focus:outline-none focus:ring-2 focus:ring-brand-orange transition-all;
   }
+
+    /* Badge Styles */
+  .badge-paid { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700; }
+  .badge-unpaid { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-700; }
+  .badge-active { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700; }
+
+  /* Table & Sidebar Styles */
+  .table-header { @apply text-xs font-semibold uppercase tracking-wide text-text-secondary bg-brand-off-white border-b border-border-base; }
+  .table-row { @apply border-b border-gray-100 hover:bg-gray-50 transition-colors; }
+  
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-secondary rounded-lg
+           hover:bg-brand-orange-light hover:text-brand-orange transition-all;
+  }
+}
