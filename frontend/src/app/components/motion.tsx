@@ -106,3 +106,5 @@ export function AnimatedStat({
     </motion.div>
   );
 }
+
+export { motion };
