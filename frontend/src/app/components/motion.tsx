@@ -87,3 +87,22 @@ export function CTAButton({
     </motion.a>
   );
 }
+
+export function AnimatedStat({
+  value,
+  label,
+}: {
+  value: string;
+  label: string;
+}) {
+  return (
+    <motion.div
+      className="text-center px-4"
+      variants={fadeUp}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
+      <div className="font-display text-4xl font-bold text-brand-orange">{value}</div>
+      <div className="text-[10px] font-bold tracking-widest text-gray-400 mt-2 uppercase">{label}</div>
+    </motion.div>
+  );
+}
