@@ -1,4 +1,3 @@
-// Branch: feature/bookings  |  Owner: Derrick
 const pool = require("../config/db");
 
 // GET /api/bookings
@@ -59,6 +58,74 @@ async function bookClass(req, res) {
       [req.user.id, classId]
     );
     res.status(201).json({ success: true, data: { booking: rows[0] }, message: "Booked successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+// GET /api/bookings/:id — Get specific class details
+async function getClassById(req, res) {
+  try {
+    const { id } = req.params;
+    const { rows } = await pool.query(
+      `SELECT c.*, 
+              COUNT(b.id) FILTER (WHERE b.cancelled = FALSE) AS booked_count 
+       FROM classes c 
+       LEFT JOIN bookings b ON b.class_id = c.id 
+       WHERE c.id = $1 
+       GROUP BY c.id`, 
+      [id]
+    );
+    if (!rows[0]) return res.status(404).json({ success: false, message: "Class not found" });
+    res.json({ success: true, data: { fitnessClass: rows[0] } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+// PATCH /api/bookings/:id — Update class info (Admin/Staff)
+async function updateClass(req, res) {
+  try {
+    const { id } = req.params;
+    const { name, nameAm, instructor, location, scheduleAt, durationMin, capacity, isActive } = req.body;
+    
+    const { rows } = await pool.query(
+      `UPDATE classes 
+       SET name = COALESCE($1, name), 
+           name_am = COALESCE($2, name_am), 
+           instructor = COALESCE($3, instructor), 
+           location = COALESCE($4, location), 
+           schedule_at = COALESCE($5, schedule_at), 
+           duration_min = COALESCE($6, duration_min), 
+           capacity = COALESCE($7, capacity),
+           is_active = COALESCE($8, is_active)
+       WHERE id = $9 RETURNING *`,
+      [name, nameAm, instructor, location, scheduleAt, durationMin, capacity, isActive, id]
+    );
+
+    if (!rows[0]) return res.status(404).json({ success: false, message: "Class not found" });
+    res.json({ success: true, data: { fitnessClass: rows[0] }, message: "Class updated" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+// PATCH /api/bookings/:id/booking/:bookingId — Cancel or Update a booking
+async function updateBooking(req, res) {
+  try {
+    const { bookingId } = req.params;
+    const { cancelled } = req.body; // Usually used to cancel a booking
+
+    const { rows } = await pool.query(
+      "UPDATE bookings SET cancelled = $1 WHERE id = $2 RETURNING *",
+      [cancelled, bookingId]
+    );
+
+    if (!rows[0]) return res.status(404).json({ success: false, message: "Booking not found" });
+    res.json({ success: true, data: { booking: rows[0] }, message: "Booking updated" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Internal server error" });
