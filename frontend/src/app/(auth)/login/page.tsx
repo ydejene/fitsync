@@ -44,6 +44,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-brand-off-white flex items-center justify-center px-4 font-sans">
       <div className="w-full max-w-md">
+
+        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-10 h-10 bg-brand-orange rounded-xl flex items-center justify-center">
@@ -55,8 +57,51 @@ export default function LoginPage() {
           <p className="text-sm text-text-secondary mt-1">Sign in to your account</p>
         </div>
 
+        {/* Form Card */}
         <div className="card p-8">
-          <p className="text-sm text-text-secondary text-center">Login form coming soon...</p>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wide text-text-secondary mb-1.5">
+                Email address
+              </label>
+              <input
+                type="email"
+                className="input"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wide text-text-secondary mb-1.5">
+                Password
+              </label>
+              <input
+                type="password"
+                className="input"
+                placeholder="Enter your password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg">
+                <i className="fa-solid fa-circle-exclamation text-red-500 text-sm" />
+                <span className="text-sm text-red-600">{error}</span>
+              </div>
+            )}
+
+            <button type="submit" className="btn-primary w-full justify-center py-3" disabled={loading}>
+              {loading ? (
+                <><i className="fa-solid fa-spinner fa-spin text-xs" /> Signing in...</>
+              ) : (
+                <><i className="fa-solid fa-arrow-right-to-bracket text-xs" /> Sign In</>
+              )}
+            </button>
+          </form>
         </div>
 
         <p className="text-center text-xs text-text-muted mt-6">
