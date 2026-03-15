@@ -1,5 +1,3 @@
-// Branch: feature/dashboard-stats  |  Owner: Tokiniaina
-// ALGORITHM 1 — Fixed Sliding Window for expiring memberships
 const pool = require("../config/db");
 
 // GET /api/dashboard

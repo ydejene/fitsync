@@ -1,4 +1,3 @@
-// Branch: feature/memberships  |  Owner: Tokiniaina
 const pool = require("../config/db");
 
 // GET /api/memberships

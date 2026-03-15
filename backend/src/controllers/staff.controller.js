@@ -1,4 +1,3 @@
-// Branch: feature/auth (staff management)  |  Owner: Abdul
 const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
 

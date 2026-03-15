@@ -1,4 +1,3 @@
-// Branch: feature/members  |  Owner: Yonas
 const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
 
