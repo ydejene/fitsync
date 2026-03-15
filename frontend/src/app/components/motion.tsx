@@ -2,7 +2,6 @@
 
 import { motion, type Variants } from "framer-motion";
 
-/* ── fade-up on scroll ── */
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 32 },
   visible: { opacity: 1, y: 0 },
@@ -24,6 +23,28 @@ export function FadeIn({
       whileInView="visible"
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export function StaggerContainer({
+  children,
+  className,
+  stagger = 0.1,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  stagger?: number;
+}) {
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ staggerChildren: stagger }}
       className={className}
     >
       {children}
