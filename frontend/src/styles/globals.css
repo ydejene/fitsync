@@ -38,3 +38,24 @@
     font-family: var(--font-display);
   }
 }
+
+/* UI Components */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-brand-orange text-white text-sm font-semibold rounded-lg
+           hover:bg-brand-orange-dark active:scale-95 transition-all duration-150;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-white text-text-primary text-sm font-semibold rounded-lg border border-border-base
+           hover:bg-surface-2 active:scale-95 transition-all;
+  }
+
+  .card {
+    @apply bg-white rounded-xl border border-border-base shadow-sm overflow-hidden;
+  }
+
+  .input {
+    @apply w-full px-4 py-2.5 bg-white border border-border-base rounded-lg text-sm text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-brand-orange transition-all;
+  }
