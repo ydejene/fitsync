@@ -1,4 +1,3 @@
-// Branch: feature/auth (audit log)  |  Owner: Abdul
 const pool = require("../config/db");
 
 // GET /api/audit

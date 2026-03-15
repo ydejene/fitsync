@@ -1,6 +1,3 @@
-// Branch: feature/payments  |  Owner: Brian
-// ALGORITHM 2 — Atomic Payment Transaction
-// Uses BEGIN/COMMIT so payment + membership update + audit log all succeed or all roll back
 const pool = require("../config/db");
 
 // GET /api/payments
