@@ -1,26 +1,114 @@
 # FitSync
 
-FitSync is a gym management platform built for the Addis Ababa market. The current codebase is split into a Next.js frontend and an Express/PostgreSQL backend, with support for member management, memberships, payments, bookings, staff, analytics, and audit logs.
+FitSync is a gym membership and operations management platform being built for the Addis Ababa market. The current repository contains a Next.js frontend, an Express backend, and a PostgreSQL setup script for core gym workflows such as member management, memberships, bookings, staff, analytics, and audit logs.
 
-## Current Stack
+This README focuses on what is currently present in the codebase and how to run it locally. It does not treat every screen or route as production-verified unless explicitly stated.
 
-- Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS
-- Backend: Node.js, Express, PostgreSQL, JWT auth
-- Database: PostgreSQL via `pg`
-- Auth flow: backend signs the `fitsync_token` cookie, frontend verifies it for protected dashboard pages
+## Table of Contents
 
-## Implemented Modules
+- [Project Overview](#project-overview)
+- [Target Users](#target-users)
+- [Current Repository Status](#current-repository-status)
+- [Tech Stack](#tech-stack)
+- [System Architecture](#system-architecture)
+- [Repository Structure](#repository-structure)
+- [Environment Variables](#environment-variables)
+- [Local Development Setup](#local-development-setup)
+- [Database Bootstrap](#database-bootstrap)
+- [Backend API Areas](#backend-api-areas)
+- [Access Control](#access-control)
+- [Current Notes and Gaps](#current-notes-and-gaps)
+- [Contribution Workflow](#contribution-workflow)
 
-- Public landing page
-- Login flow
-- Dashboard
-- Members
-- Memberships
-- Payments
-- Bookings
-- Staff
-- Analytics
-- Audit log
+## Project Overview
+
+FitSync is intended to help gyms manage:
+
+- member records
+- membership plans and active subscriptions
+- class scheduling and bookings
+- staff administration
+- dashboard reporting and analytics
+- audit logging for key actions
+
+The codebase is currently organized as a split frontend/backend application:
+
+- `frontend/`: Next.js application
+- `backend/`: Express API and PostgreSQL bootstrap logic
+
+## Target Users
+
+| User Type | Current Relevance in Repo |
+| --- | --- |
+| Admin | Full backend and dashboard access in the current role model |
+| Staff | Operational dashboard access for day-to-day management flows |
+| Member | Exists in the domain model and role checks, but member self-service flows are not documented as complete here |
+
+## Current Repository Status
+
+This section is deliberately scoped to what is present in the repository today.
+
+### Public and Auth Flows Present
+
+- public landing page
+- login flow
+- JWT cookie-based authentication between frontend and backend
+
+### Dashboard Areas Present in the Codebase
+
+- dashboard overview
+- members
+- memberships
+- bookings
+- staff
+- analytics
+- audit log
+
+### Payments Note
+
+Payment-related pages and backend routes exist in the codebase, but this README does not claim verified payment gateway integration from the current repository state alone.
+
+## Tech Stack
+
+### Frontend
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS
+
+### Backend
+
+- Node.js
+- Express
+- `pg` for PostgreSQL access
+- `jsonwebtoken` for token handling
+- `cookie-parser` for cookie access
+
+### Database
+
+- PostgreSQL
+- UUID primary keys
+- `JSONB` fields where needed
+- setup bootstrapped through `backend/src/config/setup.js`
+
+## System Architecture
+
+High-level local flow:
+
+```text
+Browser
+  -> Next.js frontend
+  -> Express API
+  -> PostgreSQL
+```
+
+Important architecture notes:
+
+- the frontend does not connect directly to PostgreSQL
+- the frontend talks to the backend through REST endpoints
+- the backend issues the `fitsync_token` auth cookie
+- the frontend verifies the same token for protected dashboard pages
 
 ## Repository Structure
 
@@ -32,7 +120,8 @@ fitsync/
 │   │   ├── controllers/
 │   │   ├── middleware/
 │   │   └── routes/
-│   └── package.json
+│   ├── package.json
+│   └── package-lock.json
 ├── frontend/
 │   ├── public/
 │   ├── src/
@@ -42,39 +131,28 @@ fitsync/
 │   │   ├── styles/
 │   │   ├── types/
 │   │   └── utils/
-│   └── package.json
+│   ├── package.json
+│   └── package-lock.json
 └── README.md
 ```
 
-## Local Development Setup
+### Frontend Notes
 
-### Prerequisites
+- uses the Next.js App Router under `frontend/src/app`
+- dashboard pages live under `frontend/src/app/(auth)/(dashboard)`
+- shared server-side auth helpers live in `frontend/src/lib`
 
-- Node.js and npm
-- PostgreSQL running locally
-- A database named `fitsync_db`
+### Backend Notes
 
-### 1. Clone the repo
+- route registration is handled in `backend/src/index.js`
+- database configuration lives in `backend/src/config/db.js`
+- initial schema and seed setup lives in `backend/src/config/setup.js`
 
-```bash
-git clone git@github-thierry-ctrl:ydejene/fitsync.git
-cd fitsync
-git checkout develop
-git pull --ff-only origin develop
-git switch -c your-feature-branch
-```
+## Environment Variables
 
-### 2. Install dependencies
+There is no committed `.env.example` file in the repository at the moment. Use the correct local env files below.
 
-```bash
-cd backend
-npm install
-
-cd ../frontend
-npm install
-```
-
-### 3. Configure environment variables
+### Backend Env File
 
 Create `backend/.env`:
 
@@ -83,7 +161,10 @@ PORT=5000
 JWT_SECRET="use_the_shared_or_agreed_dev_secret"
 DATABASE_URL="postgresql://postgres:<your_postgres_password>@localhost:5432/fitsync_db"
 FRONTEND_URL="http://localhost:3000"
+NODE_ENV="development"
 ```
+
+### Frontend Env File
 
 Create `frontend/.env.local`:
 
@@ -92,58 +173,102 @@ JWT_SECRET="use_the_same_value_as_backend"
 NEXT_PUBLIC_BACKEND_URL="http://localhost:5000"
 ```
 
-Notes:
+### Env Notes
 
-- Use the same `JWT_SECRET` in both env files. The frontend verifies the same auth token the backend issues.
-- The current frontend code does not read `DATABASE_URL`; that variable is backend-only.
-- There is no committed `.env.example` file in the repo right now.
+- `JWT_SECRET` should match in both frontend and backend for the current auth flow
+- `DATABASE_URL` is used by the backend only
+- `NEXT_PUBLIC_BACKEND_URL` points the frontend to the backend API
+- `FRONTEND_URL` is used by backend CORS configuration
 
-### 4. Initialize the database
+## Local Development Setup
 
-Run the backend setup script after `backend/.env` is in place:
+### Prerequisites
+
+- Node.js and npm
+- PostgreSQL running locally
+- a local database named `fitsync_db`
+
+### 1. Clone the repository
+
+```bash
+git clone <your-remote-url>
+cd fitsync
+git checkout develop
+git pull --ff-only origin develop
+git switch -c your-feature-branch
+```
+
+### 2. Install backend dependencies
+
+```bash
+cd backend
+npm install
+```
+
+### 3. Install frontend dependencies
+
+```bash
+cd ../frontend
+npm install
+```
+
+### 4. Add environment files
+
+- create `backend/.env`
+- create `frontend/.env.local`
+
+### 5. Initialize the database
 
 ```bash
 cd backend
 node src/config/setup.js
 ```
 
-This script:
-
-- enables `pgcrypto`
-- creates the core tables
-- seeds membership plans
-- seeds a default admin user
-
-Seeded admin credentials:
-
-- email: `admin@fitsync.et`
-- password: `password`
-
-### 5. Start the apps
-
-Start the backend:
+### 6. Start the backend
 
 ```bash
 cd backend
 npm run dev
 ```
 
-Start the frontend in a second terminal:
+### 7. Start the frontend
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-Local URLs:
+### Local URLs
 
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:5000`
-- Backend health check: `http://localhost:5000/api/health`
+- frontend: `http://localhost:3000`
+- backend: `http://localhost:5000`
+- backend health check: `http://localhost:5000/api/health`
+
+## Database Bootstrap
+
+The repository currently uses `backend/src/config/setup.js` to prepare the initial schema and seed baseline data.
+
+The script currently:
+
+- enables the `pgcrypto` extension
+- creates the `users` table
+- creates the `plans` table
+- creates the `memberships` table
+- creates the `payments` table
+- creates the `classes` table
+- creates the `bookings` table
+- creates the `audit_logs` table
+- seeds default membership plans
+- seeds a default admin user
+
+### Seeded Admin Account
+
+- email: `admin@fitsync.et`
+- password: `password`
 
 ## Backend API Areas
 
-The Express app currently exposes these route groups:
+The Express app currently exposes the following route groups:
 
 - `/api/auth`
 - `/api/members`
@@ -155,36 +280,32 @@ The Express app currently exposes these route groups:
 - `/api/analytics`
 - `/api/audit`
 
-## Database Notes
+## Access Control
 
-The current backend uses PostgreSQL, not MySQL. The setup script creates these tables:
+The current backend role model uses:
 
-- `users`
-- `plans`
-- `memberships`
-- `payments`
-- `classes`
-- `bookings`
-- `audit_logs`
+- `ADMIN`
+- `STAFF`
+- `MEMBER`
 
-The schema uses UUID primary keys and PostgreSQL-specific features such as `gen_random_uuid()` and `JSONB`.
+Current middleware behavior in the repo:
 
-## Frontend Notes
+- authentication is required for protected routes
+- admin or staff access is required for most dashboard management routes
+- admin-only access is enforced for audit and staff management routes
 
-- The frontend uses the Next.js App Router under `frontend/src/app`.
-- Protected dashboard pages rely on server-side session checks in `frontend/src/lib/auth.ts`.
-- The frontend talks to the backend through `NEXT_PUBLIC_BACKEND_URL`.
+## Current Notes and Gaps
+
+- this README is intended to describe the current repo state, not full production verification
+- payment gateway integration should not be treated as verified from this README alone
+- there is no committed `.env.example` file yet
+- there is no root-level automated test setup yet
+- `frontend/README.md` is still the default scaffold README
 
 ## Contribution Workflow
 
-- Branch from `develop`
-- Push your work to your own branch
-- Open a PR into `develop`
-- Request review from Abdul or Yonas
-- Do not merge your own PR
-
-## Current Gaps
-
-- There is no root-level automated test setup yet
-- There is no committed `.env.example` file yet
-- The frontend still has the default scaffold README at `frontend/README.md`
+- branch from `develop`
+- push changes to your own branch
+- open a PR into `develop`
+- request review from Abdul or Yonas
+- do not merge your own PR
