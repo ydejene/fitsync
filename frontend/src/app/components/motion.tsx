@@ -65,3 +65,25 @@ export function StaggerItem({
     </motion.div>
   );
 }
+
+export function CTAButton({
+  children,
+  className,
+  href,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  href: string;
+}) {
+  return (
+    <motion.a
+      href={href}
+      className={className}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+    >
+      {children}
+    </motion.a>
+  );
+}
