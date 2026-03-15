@@ -1,0 +1,84 @@
+// Branch: feature/auth  |  Owner: Abdul
+const pool = require("../config/db");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+// POST /api/auth/login
+async function login(req, res) {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res.status(400).json({ success: false, message: "Email and password required" });
+
+    const { rows } = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+    const user = rows[0];
+    if (!user)
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    if (user.status === "INACTIVE")
+      return res.status(401).json({ success: false, message: "Account is deactivated" });
+
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid)
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    res.cookie("fitsync_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    // Audit log
+    await pool.query(
+      "INSERT INTO audit_logs (actor_id, actor_email, action, entity_type, entity_id) VALUES ($1,$2,$3,$4,$5)",
+      [user.id, user.email, "LOGIN", "user", user.id]
+    );
+
+    res.json({
+      success: true,
+      message: "Login successful",
+      data: { user: { id: user.id, fullName: user.full_name, email: user.email, role: user.role } },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+// POST /api/auth/logout
+function logout(_req, res) {
+  res.clearCookie("fitsync_token");
+  res.json({ success: true, message: "Logged out successfully" });
+}
+
+// GET /api/auth/me
+async function me(req, res) {
+  try {
+    const { rows } = await pool.query(
+      "SELECT id, full_name, email, role, status FROM users WHERE id = $1",
+      [req.user.id]
+    );
+    const user = rows[0];
+    if (!user)
+      return res.status(404).json({ success: false, message: "User not found" });
+
+    res.json({
+      success: true,
+      data: { user: { id: user.id, fullName: user.full_name, email: user.email, role: user.role } },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports = { login, logout, me };
