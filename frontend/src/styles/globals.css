@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Colors */
+  --color-brand-orange: #F15A24;
+  --color-brand-orange-dark: #D14A18;
+  --color-brand-orange-light: #FFF0EB;
+  --color-brand-white: #FFFFFF;
+  --color-brand-off-white: #F8F8F8;
+  
+  /* Semantic Colors */
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F5F5F5;
+  --color-border-base: #E5E5E5;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #6B6B6B;
+  --color-text-muted: #9CA3AF;
+  
+  /* Status Colors */
+  --color-success-base: #16A34A;
+  --color-warning-base: #D97706;
+  --color-danger-base: #DC2626;
+  --color-info-base: #2563EB;
+
+  /* Font Mappings */
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui;
+  --font-display: var(--font-barlow), ui-sans-serif, system-ui;
+}
+
+/* Base Styles */
+@layer base {
+  body {
+    @apply bg-brand-off-white text-text-primary antialiased;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+/* UI Components */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-brand-orange text-white text-sm font-semibold rounded-lg
+           hover:bg-brand-orange-dark active:scale-95 transition-all duration-150;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-white text-text-primary text-sm font-semibold rounded-lg border border-border-base
+           hover:bg-surface-2 active:scale-95 transition-all;
+  }
+
+  .card {
+    @apply bg-white rounded-xl border border-border-base shadow-sm overflow-hidden;
+  }
+
+  .input {
+    @apply w-full px-4 py-2.5 bg-white border border-border-base rounded-lg text-sm text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-brand-orange transition-all;
+  }
+
+  /* Badge Styles */
+  .badge-paid { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700; }
+  .badge-unpaid { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-700; }
+  .badge-active { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700; }
+
+  /* Table & Sidebar Styles */
+  .table-header { @apply text-xs font-semibold uppercase tracking-wide text-text-secondary bg-brand-off-white border-b border-border-base; }
+  .table-row { @apply border-b border-gray-100 hover:bg-gray-50 transition-colors; }
+  
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-secondary rounded-lg
+           hover:bg-brand-orange-light hover:text-brand-orange transition-all;
+  }
+}
