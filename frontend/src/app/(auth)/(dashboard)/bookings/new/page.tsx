@@ -69,7 +69,7 @@ export default function AddClassPage() {
         </Link>
       </div>
 
-      <div className="card max-w-2xl">
+      <div className="card w-full p-6 mt-6">
         {error && (
           <div className="mb-6 flex items-center gap-3 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-red-700 text-sm">
             <i className="fa-solid fa-circle-exclamation" />

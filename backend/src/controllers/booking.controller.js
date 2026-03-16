@@ -132,4 +132,4 @@ async function updateBooking(req, res) {
   }
 }
 
-module.exports = { getClasses, createClass, bookClass };
+module.exports = { getClasses, createClass, bookClass, getClassById, updateClass, updateBooking };
