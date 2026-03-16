@@ -3,6 +3,13 @@
 // Branch: feature/landing-page (Derrick)
 
 import Link from "next/link";
+import {
+  FadeIn,
+  StaggerContainer,
+  StaggerItem,
+  CTAButton,
+  AnimatedStat,
+} from "./components/motion";
 
 export default function LandingPage() {
   return (
@@ -29,9 +36,9 @@ export default function LandingPage() {
             <Link href="/login" className="text-sm font-medium text-text-primary hover:text-brand-orange transition-colors">
               Sign in
             </Link>
-            <Link href="/login" className="btn-primary text-sm">
+            <CTAButton href="/login" className="btn-primary text-sm">
               Get Started
-            </Link>
+            </CTAButton>
           </div>
         </div>
       </nav>
@@ -45,40 +52,47 @@ export default function LandingPage() {
         </div>
         <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
-            <span className="inline-block px-3 py-1 bg-brand-orange text-white text-xs font-semibold rounded-full uppercase tracking-widest mb-6">
-              Built for Ethiopia
-            </span>
-            <h1 className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6">
-              Manage Your Gym
-              <span className="text-brand-orange block">The Smart Way</span>
-            </h1>
-            <p className="text-lg text-gray-300 mb-10 max-w-xl leading-relaxed">
-              The first all-in-one gym management platform built for Ethiopia. Accept 
-              Telebirr and CBE Birr payments directly in ETB. Stop revenue leakage 
-              and grow your member base effortlessly.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link href="/login" className="btn-primary px-8 py-3.5 text-base">
-                Start Free Pilot
-                <i className="fa-solid fa-arrow-right text-xs" />
-              </Link>
-              <a href="#features" className="flex items-center gap-2 text-gray-300 hover:text-white text-sm font-medium transition-colors border border-white/20 px-6 py-3.5 rounded-lg">
-                See how it works
-              </a>
-            </div>
+            <FadeIn>
+              <span className="inline-block px-3 py-1 bg-brand-orange text-white text-xs font-semibold rounded-full uppercase tracking-widest mb-6">
+                Built for Ethiopia
+              </span>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <h1 className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6">
+                Manage Your Gym
+                <span className="text-brand-orange block">The Smart Way</span>
+              </h1>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <p className="text-lg text-gray-300 mb-10 max-w-xl leading-relaxed">
+                The first all-in-one gym management platform built for Ethiopia. Accept
+                Telebirr and CBE Birr payments directly in ETB. Stop revenue leakage
+                and grow your member base effortlessly.
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.3}>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <CTAButton href="/login" className="btn-primary px-8 py-3.5 text-base">
+                  Start Free Pilot
+                  <i className="fa-solid fa-arrow-right text-xs" />
+                </CTAButton>
+                <CTAButton href="#features" className="flex items-center gap-2 text-gray-300 hover:text-white text-sm font-medium transition-colors border border-white/20 px-6 py-3.5 rounded-lg">
+                  See how it works
+                </CTAButton>
+              </div>
+            </FadeIn>
 
-            <div className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-white/10 pt-8 w-full">
+            <StaggerContainer className="mt-16 flex flex-wrap items-center justify-center gap-12 border-t border-white/10 pt-8 w-full" stagger={0.15}>
               {[
                 { label: "REVENUE LEAKAGE", value: "< 3%" },
                 { label: "FASTER PAYMENTS", value: "30%" },
                 { label: "PILOT GYM IN ADDIS", value: "#1" },
               ].map((stat) => (
-                <div key={stat.label} className="text-center px-4">
-                  <div className="font-display text-4xl font-bold text-brand-orange">{stat.value}</div>
-                  <div className="text-[10px] font-bold tracking-widest text-gray-400 mt-2 uppercase">{stat.label}</div>
-                </div>
+                <StaggerItem key={stat.label}>
+                  <AnimatedStat value={stat.value} label={stat.label} />
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerContainer>
           </div>
         </div>
       </section>
@@ -100,13 +114,13 @@ export default function LandingPage() {
       {/* Features */}
       <section id="features" className="py-24 bg-brand-off-white">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
+          <FadeIn className="text-center mb-16">
             <span className="text-brand-orange text-sm font-semibold uppercase tracking-widest">Platform Features</span>
             <h2 className="font-display text-4xl font-bold text-text-primary mt-2">
               Everything you need to run a gym
             </h2>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          </FadeIn>
+          <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" stagger={0.08}>
             {[
               { icon: "fa-users", title: "Member Management", desc: "Track profiles, subscriptions, health records, and attendance — all in one view." },
               { icon: "fa-credit-card", title: "Local Payments", desc: "Accept Telebirr, CBE Birr, and cash. All amounts in Ethiopian Birr." },
@@ -115,28 +129,30 @@ export default function LandingPage() {
               { icon: "fa-calendar", title: "Class Booking", desc: "Let members book HIIT, Yoga, CrossFit sessions. Track attendance instantly." },
               { icon: "fa-shield", title: "Audit Trail", desc: "Immutable log of all changes to prevent staff maladministration." },
             ].map((feat) => (
-              <div key={feat.title} className="card p-6 hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 bg-brand-orange-light rounded-lg flex items-center justify-center mb-4">
-                  <i className={`fa-solid ${feat.icon} text-brand-orange`} />
+              <StaggerItem key={feat.title}>
+                <div className="card p-6 hover:shadow-md transition-shadow h-full">
+                  <div className="w-10 h-10 bg-brand-orange-light rounded-lg flex items-center justify-center mb-4">
+                    <i className={`fa-solid ${feat.icon} text-brand-orange`} />
+                  </div>
+                  <h3 className="font-display text-lg font-semibold text-text-primary mb-2">{feat.title}</h3>
+                  <p className="text-sm text-text-secondary leading-relaxed">{feat.desc}</p>
                 </div>
-                <h3 className="font-display text-lg font-semibold text-text-primary mb-2">{feat.title}</h3>
-                <p className="text-sm text-text-secondary leading-relaxed">{feat.desc}</p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* Plans */}
       <section id="plans" className="py-24 bg-white">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-16">
+          <FadeIn className="text-center mb-16">
             <span className="text-brand-orange text-sm font-semibold uppercase tracking-widest">Membership Plans</span>
             <h2 className="font-display text-4xl font-bold text-text-primary mt-2">
               Simple, transparent pricing in ETB
             </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          </FadeIn>
+          <StaggerContainer className="grid md:grid-cols-3 gap-6" stagger={0.12}>
             {[
               {
                 name: "Basic", nameAm: "መሠረታዊ", price: "500", cycle: "/ month",
@@ -154,49 +170,50 @@ export default function LandingPage() {
                 highlight: false,
               },
             ].map((plan) => (
-              <div
-                key={plan.name}
-                className={`rounded-xl p-8 border-2 relative ${
-                  plan.highlight
-                    ? "border-brand-orange bg-[#FFF8F5]"
-                    : "border-border-base bg-white"
-                }`}
-              >
-                {plan.highlight && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-brand-orange text-white text-xs font-bold rounded-full uppercase tracking-wide">
-                    Popular
-                  </span>
-                )}
-                <div className="mb-6">
-                  <h3 className="font-display text-2xl font-bold text-text-primary">{plan.name}</h3>
-                  <p className="text-text-secondary text-sm mt-0.5">{plan.nameAm}</p>
-                  <div className="mt-4 flex items-end gap-1">
-                    <span className="text-xs text-text-secondary mb-1">ETB</span>
-                    <span className="font-display text-4xl font-bold text-text-primary">{plan.price}</span>
-                    <span className="text-text-secondary text-sm mb-1">{plan.cycle}</span>
-                  </div>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-text-primary">
-                      <i className="fa-solid fa-check text-brand-orange text-xs" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/login"
-                  className={`block text-center py-3 rounded-lg text-sm font-semibold transition-all ${
+              <StaggerItem key={plan.name}>
+                <div
+                  className={`rounded-xl p-8 border-2 relative h-full ${
                     plan.highlight
-                      ? "bg-brand-orange text-white hover:bg-brand-orange-dark"
-                      : "border border-border-base text-text-primary hover:bg-brand-off-white"
+                      ? "border-brand-orange bg-[#FFF8F5]"
+                      : "border-border-base bg-white"
                   }`}
                 >
-                  Get Started
-                </Link>
-              </div>
+                  {plan.highlight && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-brand-orange text-white text-xs font-bold rounded-full uppercase tracking-wide">
+                      Popular
+                    </span>
+                  )}
+                  <div className="mb-6">
+                    <h3 className="font-display text-2xl font-bold text-text-primary">{plan.name}</h3>
+                    <p className="text-text-secondary text-sm mt-0.5">{plan.nameAm}</p>
+                    <div className="mt-4 flex items-end gap-1">
+                      <span className="text-xs text-text-secondary mb-1">ETB</span>
+                      <span className="font-display text-4xl font-bold text-text-primary">{plan.price}</span>
+                      <span className="text-text-secondary text-sm mb-1">{plan.cycle}</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-sm text-text-primary">
+                        <i className="fa-solid fa-check text-brand-orange text-xs" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <CTAButton
+                    href="/login"
+                    className={`block text-center py-3 rounded-lg text-sm font-semibold transition-all ${
+                      plan.highlight
+                        ? "bg-brand-orange text-white hover:bg-brand-orange-dark"
+                        : "border border-border-base text-text-primary hover:bg-brand-off-white"
+                    }`}
+                  >
+                    Get Started
+                  </CTAButton>
+                </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
@@ -211,7 +228,7 @@ export default function LandingPage() {
                 <span className="font-display text-2xl font-bold tracking-tight">FitSync</span>
               </div>
               <p className="text-gray-400 text-sm max-w-sm leading-relaxed mb-6">
-                The leading gym management platform in Ethiopia. 
+                The leading gym management platform in Ethiopia.
                 We simplify operations so you can focus on building a healthier community.
               </p>
               <div className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors">

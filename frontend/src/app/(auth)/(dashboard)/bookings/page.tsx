@@ -37,7 +37,7 @@ export default async function BookingsPage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
         {classes.length === 0 ? (
           <div className="col-span-full bg-white border border-[#E5E5E5] rounded-2xl p-16 text-center text-[#9CA3AF]">
             <i className="fa-solid fa-calendar-days text-3xl block mb-3" />
