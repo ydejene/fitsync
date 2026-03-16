@@ -106,6 +106,34 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-brand-light-gray" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-text-muted">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+              <button
+                type="button"
+                className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-full border border-[#dadce0] bg-white hover:bg-[#f8f9fa] shadow-sm transition-colors"
+                onClick={() => alert("Google Login not yet implemented.")}
+              >
+                <img
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  alt="Google logo"
+                  className="w-5 h-5"
+                />
+                <span className="text-[#3c4043] font-medium text-sm font-sans tracking-wide">
+                  Sign in with Google
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <p className="text-center text-xs text-text-muted mt-6">
