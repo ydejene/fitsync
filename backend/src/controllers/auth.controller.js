@@ -103,6 +103,15 @@ async function googleLogin(req, res) {
       { expiresIn: "24h" }
     );
 
+    // Set cookie
+    res.cookie("fitsync_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+
 
 }
 
