@@ -1,6 +1,9 @@
 const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // POST /api/auth/login
 async function login(req, res) {
@@ -53,6 +56,25 @@ async function login(req, res) {
   }
 }
 
+// POST /api/auth/google
+async function googleLogin(req, res) {
+  try {
+    const { idToken } = req.body;
+    if (!idToken) {
+      return res.status(400).json({ success: false, message: "ID token is required" });
+    }
+
+    // Verify Google ID token
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { email, name, sub: googleId } = payload;
+
+
+}
+
 // POST /api/auth/logout
 function logout(_req, res) {
   res.clearCookie("fitsync_token");
@@ -80,4 +102,4 @@ async function me(req, res) {
   }
 }
 
-module.exports = { login, logout, me };
+module.exports = { login, googleLogin, logout, me };
