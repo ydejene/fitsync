@@ -53,6 +53,20 @@ export default function LoginPage() {
         credentials: "include",
       });
 
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || "Google authentication failed");
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch (err) {
+      setError("Failed to login with Google");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-brand-off-white flex items-center justify-center px-4 font-sans">
