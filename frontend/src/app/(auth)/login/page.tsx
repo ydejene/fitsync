@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,7 +11,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Use an environment variable or a constant for the backend URL
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
   async function handleSubmit(e: React.FormEvent) {
@@ -19,15 +19,13 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // 1. Point to the Express URL
-      // 2. Add 'credentials: "include"' to allow the backend to set cookies
       const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
-        credentials: "include", 
+        credentials: "include",
       });
-      
+
       const data = await res.json();
 
       if (!res.ok || !data.success) {
@@ -35,7 +33,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Success! Redirect to dashboard
       router.push("/dashboard");
     } catch (err) {
       setError("Cannot connect to server. Is the backend running?");
@@ -45,10 +42,21 @@ export default function LoginPage() {
     }
   }
 
+  async function handleGoogleSuccess(credentialResponse: any) {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken: credentialResponse.credential }),
+        credentials: "include",
+      });
+
+
   return (
     <div className="min-h-screen bg-brand-off-white flex items-center justify-center px-4 font-sans">
       <div className="w-full max-w-md">
-
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
@@ -61,7 +69,7 @@ export default function LoginPage() {
           <p className="text-sm text-text-secondary mt-1">Sign in to your account</p>
         </div>
 
-        {/* Card Component from your globals.css */}
+        {/* Card Component */}
         <div className="card p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -117,21 +125,17 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-center">
-              <button
-                type="button"
-                className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-full border border-[#dadce0] bg-white hover:bg-[#f8f9fa] shadow-sm transition-colors"
-                onClick={() => alert("Google Login not yet implemented.")}
-              >
-                <img
-                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                  alt="Google logo"
-                  className="w-5 h-5"
+            <div className="mt-6">
+              <div className="w-full flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => setError("Google login failed")}
+                  useOneTap
+                  theme="outline"
+                  shape="circle"
+                  width="320px"
                 />
-                <span className="text-[#3c4043] font-medium text-sm font-sans tracking-wide">
-                  Sign in with Google
-                </span>
-              </button>
+              </div>
             </div>
           </div>
         </div>
