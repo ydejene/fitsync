@@ -87,6 +87,22 @@ async function googleLogin(req, res) {
       );
       user = insertResult.rows[0];
 
+      // Initial audit log for registration
+      await pool.query(
+        "INSERT INTO audit_logs (actor_id, actor_email, action, entity_type, entity_id) VALUES ($1, $2, $3, $4, $5)",
+        [user.id, user.email, "REGISTER_GOOGLE", "user", user.id]
+      );
+    } else if (user.status === "INACTIVE") {
+      return res.status(401).json({ success: false, message: "Account is deactivated" });
+    }
+
+    // Generate JWT
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
 
 }
 
