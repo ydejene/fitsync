@@ -111,8 +111,21 @@ async function googleLogin(req, res) {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
+    // Audit log for login
+    await pool.query(
+      "INSERT INTO audit_logs (actor_id, actor_email, action, entity_type, entity_id) VALUES ($1, $2, $3, $4, $5)",
+      [user.id, user.email, "LOGIN_GOOGLE", "user", user.id]
+    );
 
-
+    res.json({
+      success: true,
+      message: "Google login successful",
+      data: { user: { id: user.id, fullName: user.full_name, email: user.email, role: user.role } },
+    });
+  } catch (err) {
+    console.error("Google login error:", err);
+    res.status(401).json({ success: false, message: "Invalid Google token" });
+  }
 }
 
 // POST /api/auth/logout
