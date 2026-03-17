@@ -72,6 +72,21 @@ async function googleLogin(req, res) {
     const payload = ticket.getPayload();
     const { email, name, sub: googleId } = payload;
 
+        // Check if user exists
+    let { rows } = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    let user = rows[0];
+
+    if (!user) {
+      // Create user if they don't exist
+      const randomPassword = require("crypto").randomBytes(16).toString("hex");
+      const passwordHash = await bcrypt.hash(randomPassword, 10);
+
+      const insertResult = await pool.query(
+        "INSERT INTO users (full_name, email, password_hash, role, status) VALUES ($1, $2, $3, 'MEMBER', 'ACTIVE') RETURNING *",
+        [name, email, passwordHash]
+      );
+      user = insertResult.rows[0];
+
 
 }
 
