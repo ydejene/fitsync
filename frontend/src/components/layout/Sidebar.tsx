@@ -46,6 +46,12 @@ const navItems = [
     roles: ["ADMIN"],
   },
   {
+    label: "Insights",
+    href: "/insights",
+    icon: "fa-chart-pie",
+    roles: ["ADMIN", "STAFF"],
+  },
+  {
     label: "Analytics",
     href: "/analytics",
     icon: "fa-chart-line",
