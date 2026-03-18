@@ -12,6 +12,7 @@ const dashboardRoutes  = require("./routes/dashboard.routes");
 const staffRoutes      = require("./routes/staff.routes");
 const analyticsRoutes  = require("./routes/analytics.routes");
 const auditRoutes      = require("./routes/audit.routes");
+const insightsRoutes   = require("./routes/insights.routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -37,6 +38,7 @@ app.use("/api/dashboard",   dashboardRoutes);
 app.use("/api/staff",       staffRoutes);
 app.use("/api/analytics",   analyticsRoutes);
 app.use("/api/audit",       auditRoutes);
+app.use("/api/insights",    insightsRoutes);
 
 // ── Health check ──
 app.get("/api/health", (_req, res) => {
