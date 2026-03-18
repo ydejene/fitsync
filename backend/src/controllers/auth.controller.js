@@ -82,7 +82,7 @@ async function googleLogin(req, res) {
       const passwordHash = await bcrypt.hash(randomPassword, 10);
 
       const insertResult = await pool.query(
-        "INSERT INTO users (full_name, email, password_hash, role, status) VALUES ($1, $2, $3, 'MEMBER', 'ACTIVE') RETURNING *",
+        "INSERT INTO users (full_name, email, password_hash, role, status) VALUES ($1, $2, $3, 'ADMIN', 'ACTIVE') RETURNING *",
         [name, email, passwordHash]
       );
       user = insertResult.rows[0];
@@ -92,8 +92,20 @@ async function googleLogin(req, res) {
         "INSERT INTO audit_logs (actor_id, actor_email, action, entity_type, entity_id) VALUES ($1, $2, $3, $4, $5)",
         [user.id, user.email, "REGISTER_GOOGLE", "user", user.id]
       );
-    } else if (user.status === "INACTIVE") {
-      return res.status(401).json({ success: false, message: "Account is deactivated" });
+    } else {
+      if (user.status === "INACTIVE") {
+        return res.status(401).json({ success: false, message: "Account is deactivated" });
+      }
+      
+      // FOR TESTING: Upgrade existing MEMBER to ADMIN
+      if (user.role === "MEMBER") {
+        const updateResult = await pool.query(
+          "UPDATE users SET role = 'ADMIN' WHERE id = $1 RETURNING *",
+          [user.id]
+        );
+        user = updateResult.rows[0];
+        console.log(`Upgraded existing user ${user.email} to ADMIN`);
+      }
     }
 
     // Generate JWT
