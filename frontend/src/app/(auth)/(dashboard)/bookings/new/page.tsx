@@ -12,7 +12,6 @@ export default function AddClassPage() {
 
   const [form, setForm] = useState({
     name: "",
-    nameAm: "",
     description: "",
     instructorName: "",
     location: "",
@@ -38,7 +37,6 @@ export default function AddClassPage() {
         method: "POST",
         body: JSON.stringify({
           name: form.name,
-          nameAm: form.nameAm,
           instructor: form.instructorName,
           location: form.location,
           scheduleAt: form.scheduledAt,
@@ -81,7 +79,7 @@ export default function AddClassPage() {
           {/* Class Name */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label">Class Name (English) *</label>
+              <label className="label">Class Name *</label>
               <input
                 type="text"
                 name="name"
@@ -90,18 +88,7 @@ export default function AddClassPage() {
                 className="input"
                 placeholder="e.g. Morning Yoga"
               />
-            </div>
-            <div>
-              <label className="label">Class Name (Amharic)</label>
-              <input
-                type="text"
-                name="nameAm"
-                value={form.nameAm}
-                onChange={handleChange}
-                className="input"
-                placeholder="e.g. የጠዋት ዮጋ"
-              />
-            </div>
+            </div>            
           </div>
 
           {/* Description */}
