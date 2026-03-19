@@ -6,7 +6,8 @@ export type FeeStatus = "PAID" | "UNPAID" | "OVERDUE";
 export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
 export type PaymentMethod = "TELEBIRR" | "CBE_BIRR" | "CASH" | "CARD";
 export type BillingCycle = "MONTHLY" | "QUARTERLY" | "ANNUAL";
-export type BatchTime = "MORNING" | "EVENING";
+export type BatchTime = "MORNING" | "AFTERNOON" | "EVENING";
+export type Gender = "MALE" | "FEMALE" | "OTHER";
 
 export interface User {
   id: string;
@@ -15,6 +16,7 @@ export interface User {
   phone?: string;
   address?: string;
   dob?: string;
+  gender?: Gender;
   medicalHistory?: string;
   role: Role;
   status: UserStatus;
