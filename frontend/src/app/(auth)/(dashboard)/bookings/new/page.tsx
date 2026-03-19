@@ -77,7 +77,6 @@ export default function AddClassPage() {
 
         <div className="space-y-5">
           {/* Class Name */}
-          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label">Class Name *</label>
               <input
@@ -89,7 +88,6 @@ export default function AddClassPage() {
                 placeholder="e.g. Morning Yoga"
               />
             </div>            
-          </div>
 
           {/* Description */}
           <div>
