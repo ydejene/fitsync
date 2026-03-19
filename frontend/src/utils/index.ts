@@ -1,13 +1,13 @@
 export function formatETB(amount: number): string {
-  return new Intl.NumberFormat("en-ET", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "ETB",
+    currency: "USD",
     minimumFractionDigits: 2,
   }).format(amount);
 }
 
 export function formatDate(date: string | Date): string {
-  return new Intl.DateTimeFormat("en-ET", {
+  return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -15,7 +15,7 @@ export function formatDate(date: string | Date): string {
 }
 
 export function formatDateTime(date: string | Date): string {
-  return new Intl.DateTimeFormat("en-ET", {
+  return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",

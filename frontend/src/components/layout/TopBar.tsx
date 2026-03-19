@@ -1,5 +1,4 @@
 // src/components/layout/TopBar.tsx
-// Branch: feature/dashboard-layout (Thierry)
 
 "use client";
 
@@ -8,14 +7,24 @@ import type { AuthUser } from "@/types";
 
 interface Props {
   user: AuthUser;
+  onMenuClick: () => void;
 }
 
-export default function TopBar({ user }: Props) {
+export default function TopBar({ user, onMenuClick }: Props) {
   return (
-    <header className="h-16 bg-white border-b border-[#E5E5E5] px-6 flex items-center justify-between shrink-0">
-      <div />
+    <header className="h-16 bg-white border-b border-[#E5E5E5] px-4 sm:px-6 flex items-center justify-between shrink-0">
+      {/* Hamburger — mobile only */}
+      <button
+        onClick={onMenuClick}
+        className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-[#6B6B6B] hover:bg-[#F8F8F8] transition-colors"
+      >
+        <i className="fa-solid fa-bars text-sm" />
+      </button>
 
-      <div className="flex items-center gap-4">
+      {/* Spacer for desktop */}
+      <div className="hidden lg:block" />
+
+      <div className="flex items-center gap-3 sm:gap-4">
         {/* Notification bell */}
         <button className="relative w-9 h-9 rounded-lg flex items-center justify-center text-[#6B6B6B] hover:bg-[#F8F8F8] transition-colors">
           <i className="fa-regular fa-bell text-sm" />

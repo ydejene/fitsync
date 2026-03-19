@@ -147,7 +147,7 @@ export default function EditMemberPage() {
           </div>
           <div>
             <h2 className="font-bold text-[#1A1A1A]">{member.full_name}</h2>
-            <p className="text-xs text-[#9CA3AF]">Member since {new Intl.DateTimeFormat("en-ET", { year: "numeric", month: "long" }).format(new Date(member.created_at))}</p>
+            <p className="text-xs text-[#9CA3AF]">Member since {new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long" }).format(new Date(member.created_at))}</p>
           </div>
         </div>
 

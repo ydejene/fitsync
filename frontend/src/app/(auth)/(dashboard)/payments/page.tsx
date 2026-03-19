@@ -39,7 +39,7 @@ export default async function PaymentsPage() {
         </Link>
       </div>
 
-      <div className="card overflow-hidden bg-white border border-[#E5E5E5] rounded-xl shadow-sm">
+      <div className="card overflow-x-auto bg-white border border-[#E5E5E5] rounded-xl shadow-sm">
         <table className="w-full text-sm text-left">
           <thead>
             <tr className="bg-[#FAFAFA] border-b border-[#E5E5E5]">
