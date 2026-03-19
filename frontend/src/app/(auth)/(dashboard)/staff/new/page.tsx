@@ -21,7 +21,8 @@ export default function AddStaffPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setError("");
     if (!form.fullName || !form.email || !form.password) {
       setError("Full name, email and password are required.");
@@ -92,7 +93,7 @@ export default function AddStaffPage() {
           </div>
         </div>
 
-        <div className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Full Name */}
           <div>
             <label className="label">Full Name *</label>
@@ -161,7 +162,7 @@ export default function AddStaffPage() {
           {/* Actions */}
           <div className="flex items-center gap-3 pt-2">
             <button
-              onClick={handleSubmit}
+              type="submit"
               disabled={loading}
               className="btn-primary"
             >
@@ -181,7 +182,7 @@ export default function AddStaffPage() {
               Cancel
             </Link>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
