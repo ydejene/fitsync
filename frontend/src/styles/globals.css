@@ -73,4 +73,17 @@
     @apply flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-text-secondary rounded-lg
            hover:bg-brand-orange-light hover:text-brand-orange transition-all;
   }
+
+  .page-header {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6;
+  }
+
+  .page-title {
+    @apply text-xl sm:text-2xl font-bold text-text-primary;
+    font-family: var(--font-display);
+  }
+
+  .label {
+    @apply block text-xs font-semibold uppercase tracking-wide text-text-muted mb-1.5;
+  }
 }
