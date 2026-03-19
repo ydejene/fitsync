@@ -121,7 +121,10 @@ export default function AddStaffPage() {
               />
             </div>
             <div>
-              <label className="label">Phone Number</label>
+              <label className="label">
+                Phone Number
+                <span className="ml-1 text-gray-400 font-normal">(optional)</span>
+              </label>
               <input
                 type="tel"
                 name="phone"
