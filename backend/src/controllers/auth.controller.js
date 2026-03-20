@@ -12,6 +12,12 @@ async function login(req, res) {
     if (!email || !password)
       return res.status(400).json({ success: false, message: "Email and password required" });
 
+    // Email Regex Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
+
     const { rows } = await pool.query(
       "SELECT id, full_name, email, role, status, profile_photo_url, phone, address, dob, gender, whatsapp_number, emergency_contact FROM users WHERE email = $1",
       [email]
