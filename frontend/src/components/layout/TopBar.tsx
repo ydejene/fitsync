@@ -26,12 +26,6 @@ export default function TopBar({ user, onMenuClick }: Props) {
       <div className="hidden lg:block" />
 
       <div className="flex items-center gap-3 sm:gap-4">
-        {/* Notification bell */}
-        <button className="relative w-9 h-9 rounded-lg flex items-center justify-center text-[#6B6B6B] hover:bg-[#F8F8F8] transition-colors">
-          <i className="fa-regular fa-bell text-sm" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#F15A24] rounded-full" />
-        </button>
-
         {/* User info */}
         <Link href="/profile" className="flex items-center gap-3 hover:bg-[#F8F8F8] p-1.5 rounded-xl transition-colors group">
           <div className="text-right hidden sm:block">
