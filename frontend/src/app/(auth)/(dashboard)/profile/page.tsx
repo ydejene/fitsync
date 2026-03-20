@@ -64,4 +64,48 @@ export default function ProfilePage() {
     );
   }
 
+  if (!user) return <div>User not found.</div>;
+
+  return (
+    <div className="max-w-4xl mx-auto pb-12">
+      <div className="page-header mb-8">
+        <div>
+          <h1 className="page-title text-2xl font-bold text-[#1A1A1A]">Personal Profile</h1>
+          <p className="text-sm text-[#6B6B6B] mt-1">Manage your account information and preferences</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Profile Card */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-2xl border border-[#E5E5E5] p-6 flex flex-col items-center text-center shadow-sm">
+            <div className="relative group">
+              {user.profilePhotoUrl ? (
+                <img
+                  src={user.profilePhotoUrl}
+                  alt={user.fullName}
+                  className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
+                />
+              ) : (
+                <div className="w-32 h-32 rounded-full bg-[#F15A24] flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-md">
+                  {getInitials(user.fullName)}
+                </div>
+              )}
+              <button className="absolute bottom-1 right-1 w-8 h-8 bg-white rounded-full shadow-sm border border-[#E5E5E5] flex items-center justify-center text-[#6B6B6B] hover:text-[#F15A24] transition-colors">
+                <i className="fa-solid fa-camera text-xs" />
+              </button>
+            </div>
+            
+            <h2 className="mt-4 text-xl font-bold text-[#1A1A1A]">{user.fullName}</h2>
+            <p className="text-sm text-[#F15A24] font-medium uppercase tracking-wider mt-1">{user.role}</p>
+            
+            <div className="w-full mt-6 pt-6 border-t border-[#F0F0F0]">
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-[#6B6B6B] text-xs uppercase tracking-wider font-semibold">Email Address</span>
+                <span className="text-[#1A1A1A] font-medium text-sm break-all">{user.email}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
 }
