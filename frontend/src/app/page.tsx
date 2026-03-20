@@ -155,17 +155,17 @@ export default function LandingPage() {
           <StaggerContainer className="grid md:grid-cols-3 gap-6" stagger={0.12}>
             {[
               {
-                name: "Basic", nameAm: "መሠረታዊ", price: "500", cycle: "/ month",
+                name: "Basic", price: "500", cycle: "/ month",
                 features: ["Gym access", "Locker room", "Member portal"],
                 highlight: false,
               },
               {
-                name: "Pro", nameAm: "ፕሮ", price: "1,200", cycle: "/ quarter",
+                name: "Pro", price: "1,200", cycle: "/ quarter",
                 features: ["Gym access", "All group classes", "1 trainer session", "Priority support"],
                 highlight: true,
               },
               {
-                name: "Elite", nameAm: "ኤሊት", price: "4,000", cycle: "/ year",
+                name: "Elite", price: "4,000", cycle: "/ year",
                 features: ["All access", "Personal trainer", "Nutrition plan", "Guest passes"],
                 highlight: false,
               },
@@ -185,7 +185,6 @@ export default function LandingPage() {
                   )}
                   <div className="mb-6">
                     <h3 className="font-display text-2xl font-bold text-text-primary">{plan.name}</h3>
-                    <p className="text-text-secondary text-sm mt-0.5">{plan.nameAm}</p>
                     <div className="mt-4 flex items-end gap-1">
                       <span className="text-xs text-text-secondary mb-1">ETB</span>
                       <span className="font-display text-4xl font-bold text-text-primary">{plan.price}</span>
