@@ -154,4 +154,48 @@ export default function ProfilePage() {
                   </select>
                 </div>
 
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-[#6B6B6B] mb-1.5">WhatsApp (Optional)</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2.5 bg-white border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F15A24]/20 focus:border-[#F15A24] transition-all"
+                    value={user.whatsappNumber || ""}
+                    placeholder="+251-XXX-XXXXXX"
+                    onChange={(e) => setUser({ ...user, whatsappNumber: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-[#6B6B6B] mb-1.5">Date of Birth</label>
+                  <input
+                    type="date"
+                    className="w-full px-4 py-2.5 bg-white border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F15A24]/20 focus:border-[#F15A24] transition-all"
+                    value={user.dob ? user.dob.split('T')[0] : ""}
+                    onChange={(e) => setUser({ ...user, dob: e.target.value })}
+                  />
+                </div>
+
+                <div className="col-span-1 md:col-span-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-[#6B6B6B] mb-1.5">Address</label>
+                  <textarea
+                    rows={2}
+                    className="w-full px-4 py-2.5 bg-white border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F15A24]/20 focus:border-[#F15A24] transition-all resize-none"
+                    value={user.address || ""}
+                    placeholder="Addis Ababa, Ethiopia..."
+                    onChange={(e) => setUser({ ...user, address: e.target.value })}
+                  />
+                </div>
+
+                <div className="col-span-1 md:col-span-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-[#6B6B6B] mb-1.5">Emergency Contact</label>
+                  <textarea
+                    rows={2}
+                    className="w-full px-4 py-2.5 bg-white border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F15A24]/20 focus:border-[#F15A24] transition-all resize-none"
+                    value={user.emergencyContact || ""}
+                    placeholder="Name - Phone Relation..."
+                    onChange={(e) => setUser({ ...user, emergencyContact: e.target.value })}
+                  />
+                </div>
+              </div>
+
 }
