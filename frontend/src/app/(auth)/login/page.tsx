@@ -15,6 +15,25 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
+
+    // Empty field checks
+    if (!form.email.trim()) {
+      setError("Email address is required.");
+      return;
+    }
+    if (!form.password.trim()) {
+      setError("Password is required.");
+      return;
+    }
+    
+    // Email Regex Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -96,7 +115,6 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
               />
             </div>
             <div>
@@ -109,7 +127,6 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
               />
             </div>
 
