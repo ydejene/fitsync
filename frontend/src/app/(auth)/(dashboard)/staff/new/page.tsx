@@ -21,7 +21,8 @@ export default function AddStaffPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setError("");
     if (!form.fullName || !form.email || !form.password) {
       setError("Full name, email and password are required.");
@@ -71,7 +72,7 @@ export default function AddStaffPage() {
         </Link>
       </div>
 
-      <div className="card max-w-2xl">
+      <div className="card max-w-2xl p-6">
         {error && (
           <div className="mb-6 flex items-center gap-3 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-red-700 text-sm">
             <i className="fa-solid fa-circle-exclamation" />
@@ -92,7 +93,7 @@ export default function AddStaffPage() {
           </div>
         </div>
 
-        <div className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Full Name */}
           <div>
             <label className="label">Full Name *</label>
@@ -120,7 +121,10 @@ export default function AddStaffPage() {
               />
             </div>
             <div>
-              <label className="label">Phone Number</label>
+              <label className="label">
+                Phone Number
+                <span className="ml-1 text-gray-400 font-normal">(optional)</span>
+              </label>
               <input
                 type="tel"
                 name="phone"
@@ -161,7 +165,7 @@ export default function AddStaffPage() {
           {/* Actions */}
           <div className="flex items-center gap-3 pt-2">
             <button
-              onClick={handleSubmit}
+              type="submit"
               disabled={loading}
               className="btn-primary"
             >
@@ -181,7 +185,7 @@ export default function AddStaffPage() {
               Cancel
             </Link>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
