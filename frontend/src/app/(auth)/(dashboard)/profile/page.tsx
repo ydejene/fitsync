@@ -197,5 +197,37 @@ export default function ProfilePage() {
                   />
                 </div>
               </div>
+              {message.text && (
+                <div className={`p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300 ${
+                  message.type === "success" ? "bg-green-50 text-green-700 border border-green-100" : "bg-red-50 text-red-700 border border-red-100"
+                }`}>
+                  <i className={`fa-solid ${message.type === "success" ? "fa-circle-check" : "fa-circle-exclamation"}`} />
+                  {message.text}
+                </div>
+              )}
+
+              <div className="flex items-center gap-4 pt-4 border-t border-[#F0F0F0]">
+                <button type="submit" className="bg-[#F15A24] hover:bg-[#D94E1F] text-white px-8 py-2.5 rounded-xl font-semibold transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:active:scale-100" disabled={saving}>
+                  {saving ? (
+                    <><i className="fa-solid fa-spinner fa-spin mr-2" /> Saving...</>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => fetchProfile()}
+                  className="text-sm font-medium text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
 
 }
