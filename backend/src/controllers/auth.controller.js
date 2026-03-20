@@ -13,7 +13,7 @@ async function login(req, res) {
       return res.status(400).json({ success: false, message: "Email and password required" });
 
     const { rows } = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
+      "SELECT id, full_name, email, role, status, profile_photo_url, phone, address, dob, gender, whatsapp_number, emergency_contact FROM users WHERE email = $1",
       [email]
     );
     const user = rows[0];
@@ -48,7 +48,21 @@ async function login(req, res) {
     res.json({
       success: true,
       message: "Login successful",
-      data: { user: { id: user.id, fullName: user.full_name, email: user.email, role: user.role } },
+      data: { 
+        user: { 
+          id: user.id, 
+          fullName: user.full_name, 
+          email: user.email, 
+          role: user.role,
+          profilePhotoUrl: user.profile_photo_url,
+          phone: user.phone,
+          address: user.address,
+          dob: user.dob,
+          gender: user.gender,
+          whatsappNumber: user.whatsapp_number,
+          emergencyContact: user.emergency_contact
+        } 
+      },
     });
   } catch (err) {
     console.error(err);
@@ -70,7 +84,7 @@ async function googleLogin(req, res) {
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
-    const { email, name, sub: googleId } = payload;
+    const { email, name, sub: googleId, picture: profilePhotoUrl } = payload;
 
         // Check if user exists
     let { rows } = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
@@ -82,8 +96,8 @@ async function googleLogin(req, res) {
       const passwordHash = await bcrypt.hash(randomPassword, 10);
 
       const insertResult = await pool.query(
-        "INSERT INTO users (full_name, email, password_hash, role, status) VALUES ($1, $2, $3, 'ADMIN', 'ACTIVE') RETURNING *",
-        [name, email, passwordHash]
+        "INSERT INTO users (full_name, email, password_hash, role, status, profile_photo_url) VALUES ($1, $2, $3, 'ADMIN', 'ACTIVE', $4) RETURNING *",
+        [name, email, passwordHash, profilePhotoUrl]
       );
       user = insertResult.rows[0];
 
@@ -97,6 +111,15 @@ async function googleLogin(req, res) {
         return res.status(401).json({ success: false, message: "Account is deactivated" });
       }
       
+      // Update profile photo if it changed or was missing
+      if (profilePhotoUrl && user.profile_photo_url !== profilePhotoUrl) {
+        const updatePhotoResult = await pool.query(
+          "UPDATE users SET profile_photo_url = $1 WHERE id = $2 RETURNING *",
+          [profilePhotoUrl, user.id]
+        );
+        user = updatePhotoResult.rows[0];
+      }
+
       // FOR TESTING: Upgrade existing MEMBER to ADMIN
       if (user.role === "MEMBER") {
         const updateResult = await pool.query(
@@ -110,7 +133,13 @@ async function googleLogin(req, res) {
 
     // Generate JWT
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { 
+        id: user.id, 
+        email: user.email, 
+        role: user.role,
+        fullName: user.full_name,
+        profilePhotoUrl: user.profile_photo_url
+      },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
@@ -132,7 +161,21 @@ async function googleLogin(req, res) {
     res.json({
       success: true,
       message: "Google login successful",
-      data: { user: { id: user.id, fullName: user.full_name, email: user.email, role: user.role } },
+      data: { 
+        user: { 
+          id: user.id, 
+          fullName: user.full_name, 
+          email: user.email, 
+          role: user.role,
+          profilePhotoUrl: user.profile_photo_url,
+          phone: user.phone,
+          address: user.address,
+          dob: user.dob,
+          gender: user.gender,
+          whatsappNumber: user.whatsapp_number,
+          emergencyContact: user.emergency_contact
+        } 
+      },
     });
   } catch (err) {
     console.error("Google login error:", err);
@@ -150,7 +193,7 @@ function logout(_req, res) {
 async function me(req, res) {
   try {
     const { rows } = await pool.query(
-      "SELECT id, full_name, email, role, status FROM users WHERE id = $1",
+      "SELECT id, full_name, email, role, status, profile_photo_url, phone, address, dob, gender, whatsapp_number, emergency_contact FROM users WHERE id = $1",
       [req.user.id]
     );
     const user = rows[0];
@@ -159,7 +202,21 @@ async function me(req, res) {
 
     res.json({
       success: true,
-      data: { user: { id: user.id, fullName: user.full_name, email: user.email, role: user.role } },
+      data: { 
+        user: { 
+          id: user.id, 
+          fullName: user.full_name, 
+          email: user.email, 
+          role: user.role,
+          profilePhotoUrl: user.profile_photo_url,
+          phone: user.phone,
+          address: user.address,
+          dob: user.dob,
+          gender: user.gender,
+          whatsappNumber: user.whatsapp_number,
+          emergencyContact: user.emergency_contact
+        } 
+      },
     });
   } catch (err) {
     console.error(err);
