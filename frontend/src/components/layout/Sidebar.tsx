@@ -15,6 +15,12 @@ const navItems = [
     roles: ["ADMIN", "STAFF", "MEMBER"],
   },
   {
+    label: "Profile",
+    href: "/profile",
+    icon: "fa-user-circle",
+    roles: ["ADMIN", "STAFF", "MEMBER"],
+  },
+  {
     label: "Members",
     href: "/members",
     icon: "fa-users",
