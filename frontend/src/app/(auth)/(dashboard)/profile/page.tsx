@@ -30,5 +30,38 @@ export default function ProfilePage() {
     }
   }
 
-  
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!user) return;
+
+    setSaving(true);
+    setMessage({ text: "", type: "" });
+
+    try {
+      const res = await clientFetch<any>("/api/users/profile", {
+        method: "PUT",
+        body: JSON.stringify(user),
+      });
+
+      if (res.success) {
+        setMessage({ text: "Profile updated successfully!", type: "success" });
+        router.refresh();
+      } else {
+        setMessage({ text: res.message || "Failed to update profile", type: "error" });
+      }
+    } catch (error) {
+      setMessage({ text: "Error connecting to server", type: "error" });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <i className="fa-solid fa-spinner fa-spin text-[#F15A24] text-2xl" />
+      </div>
+    );
+  }
+
 }
