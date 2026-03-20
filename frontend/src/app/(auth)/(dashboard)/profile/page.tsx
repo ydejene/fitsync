@@ -108,4 +108,50 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Edit Form */}
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-2xl border border-[#E5E5E5] p-8 shadow-sm">
+            <h3 className="text-lg font-bold text-[#1A1A1A] mb-6 flex items-center gap-2">
+              <i className="fa-solid fa-user-pen text-[#F15A24]" />
+              Account Details
+            </h3>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="col-span-1 md:col-span-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-[#6B6B6B] mb-1.5">Full Name</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2.5 bg-white border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F15A24]/20 focus:border-[#F15A24] transition-all"
+                    value={user.fullName}
+                    onChange={(e) => setUser({ ...user, fullName: e.target.value })}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-[#6B6B6B] mb-1.5">Phone Number</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2.5 bg-white border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F15A24]/20 focus:border-[#F15A24] transition-all"
+                    value={user.phone || ""}
+                    placeholder="+251-XXX-XXXXXX"
+                    onChange={(e) => setUser({ ...user, phone: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-[#6B6B6B] mb-1.5">Gender</label>
+                  <select
+                    className="w-full px-4 py-2.5 bg-white border border-[#E5E5E5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F15A24]/20 focus:border-[#F15A24] transition-all capitalize"
+                    value={user.gender || ""}
+                    onChange={(e) => setUser({ ...user, gender: e.target.value as any })}
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+
 }
