@@ -1,7 +1,3 @@
-// src/app/page.tsx
-// Landing page — public, no auth required
-// Branch: feature/landing-page (Derrick)
-
 import Link from "next/link";
 import {
   FadeIn,

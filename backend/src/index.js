@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const authRoutes       = require("./routes/auth.routes");
 const memberRoutes     = require("./routes/member.routes");
@@ -13,6 +14,7 @@ const staffRoutes      = require("./routes/staff.routes");
 const analyticsRoutes  = require("./routes/analytics.routes");
 const auditRoutes      = require("./routes/audit.routes");
 const insightsRoutes   = require("./routes/insights.routes");
+const userRoutes       = require("./routes/user.routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +26,15 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+// ── Security Headers for Google Auth ──
+app.use((_req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  next();
+});
+
+// ── Static Files ──
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // ── Routes ──
 app.get("/", (_req, res) => {
@@ -39,6 +50,7 @@ app.use("/api/staff",       staffRoutes);
 app.use("/api/analytics",   analyticsRoutes);
 app.use("/api/audit",       auditRoutes);
 app.use("/api/insights",    insightsRoutes);
+app.use("/api/users",       userRoutes);
 
 // ── Health check ──
 app.get("/api/health", (_req, res) => {
