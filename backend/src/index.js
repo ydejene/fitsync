@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const authRoutes       = require("./routes/auth.routes");
 const memberRoutes     = require("./routes/member.routes");
@@ -25,6 +26,15 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+// ── Security Headers for Google Auth ──
+app.use((_req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  next();
+});
+
+// ── Static Files ──
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // ── Routes ──
 app.get("/", (_req, res) => {
