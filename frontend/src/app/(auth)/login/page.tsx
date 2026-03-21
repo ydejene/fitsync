@@ -49,6 +49,7 @@ export default function LoginPage() {
 
       if (!res.ok || !data.success) {
         setError(data.message || "Invalid credentials");
+        setLoading(false);
         return;
       }
 
@@ -56,7 +57,6 @@ export default function LoginPage() {
     } catch (err) {
       setError("Cannot connect to server. Is the backend running?");
       console.error("Login Error:", err);
-    } finally {
       setLoading(false);
     }
   }
@@ -75,6 +75,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok || !data.success) {
         setError(data.message || "Google authentication failed");
+        setLoading(false);
         return;
       }
 
@@ -82,7 +83,6 @@ export default function LoginPage() {
     } catch (err) {
       setError("Failed to login with Google");
       console.error(err);
-    } finally {
       setLoading(false);
     }
   }
