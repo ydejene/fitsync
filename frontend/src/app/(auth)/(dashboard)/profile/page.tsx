@@ -17,6 +17,45 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    setSaving(true);
+    setMessage({ text: "", type: "" });
+
+    try {
+      // Use standard fetch for FormData since clientFetch might be JSON-only or not handle FormData
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"}/api/users/profile/photo`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setUser({ ...user, profilePhotoUrl: data.data.profilePhotoUrl });
+        setMessage({ text: "Photo updated successfully!", type: "success" });
+      } else {
+        setMessage({ text: data.message || "Failed to upload photo", type: "error" });
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      setMessage({ text: "Error uploading photo", type: "error" });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleRemovePhoto() {
+    if (!user) return;
+    setUser({ ...user, profilePhotoUrl: undefined });
+    setMessage({ text: "Photo removed! Click 'Save Changes' to confirm.", type: "success" });
+  }
+
   async function fetchProfile() {
     try {
       const res = await clientFetch<{ user: AuthUser }>("/api/auth/me");
@@ -80,6 +119,13 @@ export default function ProfilePage() {
         <div className="lg:col-span-1">
           <div className="bg-white rounded-2xl border border-[#E5E5E5] p-6 flex flex-col items-center text-center shadow-sm">
             <div className="relative group">
+              <input 
+                type="file" 
+                id="photoInput" 
+                className="hidden" 
+                accept="image/*"
+                onChange={handlePhotoUpload}
+              />
               {user.profilePhotoUrl ? (
                 <img
                   src={user.profilePhotoUrl}
@@ -90,10 +136,26 @@ export default function ProfilePage() {
                 <div className="w-32 h-32 rounded-full bg-[#F15A24] flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-md">
                   {getInitials(user.fullName)}
                 </div>
-              )}
-              <button className="absolute bottom-1 right-1 w-8 h-8 bg-white rounded-full shadow-sm border border-[#E5E5E5] flex items-center justify-center text-[#6B6B6B] hover:text-[#F15A24] transition-colors">
+              )
+              }
+              <button 
+                type="button"
+                onClick={() => document.getElementById('photoInput')?.click()}
+                className="absolute bottom-1 right-1 w-8 h-8 bg-white rounded-full shadow-sm border border-[#E5E5E5] flex items-center justify-center text-[#6B6B6B] hover:text-[#F15A24] transition-colors"
+                title="Change Photo"
+              >
                 <i className="fa-solid fa-camera text-xs" />
               </button>
+              {user.profilePhotoUrl && (
+                <button 
+                  type="button"
+                  onClick={handleRemovePhoto}
+                  className="absolute bottom-1 -left-1 w-8 h-8 bg-white rounded-full shadow-sm border border-[#E5E5E5] flex items-center justify-center text-[#6B6B6B] hover:text-red-500 transition-colors"
+                  title="Remove Photo"
+                >
+                  <i className="fa-solid fa-trash-can text-xs" />
+                </button>
+              )}
             </div>
             
             <h2 className="mt-4 text-xl font-bold text-[#1A1A1A]">{user.fullName}</h2>
