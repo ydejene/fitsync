@@ -19,7 +19,7 @@ async function login(req, res) {
     }
 
     const { rows } = await pool.query(
-      "SELECT id, full_name, email, role, status, profile_photo_url, phone, address, dob, gender, whatsapp_number, emergency_contact FROM users WHERE email = $1",
+      "SELECT id, full_name, email, password_hash, role, status, profile_photo_url, phone, address, dob, gender, whatsapp_number, emergency_contact FROM users WHERE email = $1",
       [email]
     );
     const user = rows[0];
@@ -33,7 +33,13 @@ async function login(req, res) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { 
+        id: user.id, 
+        email: user.email, 
+        role: user.role,
+        fullName: user.full_name,
+        profilePhotoUrl: user.profile_photo_url
+      },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
