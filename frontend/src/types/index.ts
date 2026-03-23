@@ -125,6 +125,12 @@ export interface AuthUser {
   fullName: string;
   role: Role;
   profilePhotoUrl?: string;
+  phone?: string;
+  address?: string;
+  dob?: string;
+  gender?: Gender;
+  whatsappNumber?: string;
+  emergencyContact?: string;
 }
 
 export interface StaffPermissions {

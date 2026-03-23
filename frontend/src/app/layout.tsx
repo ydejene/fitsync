@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import "@/styles/globals.css";
+import GoogleAuthProvider from "@/providers/GoogleAuthProvider";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -41,7 +42,11 @@ export default function RootLayout({
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
         />
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <GoogleAuthProvider>
+          {children}
+        </GoogleAuthProvider>
+      </body>
     </html>
   );
 }

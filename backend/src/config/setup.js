@@ -23,6 +23,9 @@ async function setup() {
         gender        VARCHAR(20) CHECK (gender IN ('MALE','FEMALE','OTHER')),
         role          VARCHAR(20) NOT NULL DEFAULT 'MEMBER' CHECK (role IN ('ADMIN','STAFF','MEMBER')),
         status        VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','INACTIVE')),
+        profile_photo_url TEXT,
+        whatsapp_number   VARCHAR(50),
+        emergency_contact TEXT,
         created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
@@ -118,18 +121,26 @@ async function setup() {
     // ── Safe column additions (for existing databases) ──
     console.log("Applying schema migrations...");
 
-    // Add gender column to users if missing
+    // Add profile_photo_url to users if missing
     await client.query(`
       DO $$ BEGIN
-        ALTER TABLE users ADD COLUMN gender VARCHAR(20) CHECK (gender IN ('MALE','FEMALE','OTHER'));
+        ALTER TABLE users ADD COLUMN profile_photo_url TEXT;
       EXCEPTION WHEN duplicate_column THEN NULL;
       END $$;
     `);
 
-    // Add updated_at column to memberships if missing
+    // Add whatsapp_number to users if missing
     await client.query(`
       DO $$ BEGIN
-        ALTER TABLE memberships ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+        ALTER TABLE users ADD COLUMN whatsapp_number VARCHAR(50);
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+
+    // Add emergency_contact to users if missing
+    await client.query(`
+      DO $$ BEGIN
+        ALTER TABLE users ADD COLUMN emergency_contact TEXT;
       EXCEPTION WHEN duplicate_column THEN NULL;
       END $$;
     `);
