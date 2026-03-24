@@ -1,8 +1,9 @@
 // src/app/(dashboard)/layout.tsx
-// Branch: feature/dashboard-layout (Thierry)
+// Dashboard layout with subscription enforcement for OWNER users
 
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import { apiFetch } from "@/lib/api.server";
 import Sidebar from "@/components/layout/Sidebar";
 import TopBar from "@/components/layout/TopBar";
 
@@ -13,6 +14,19 @@ export default async function DashboardLayout({
 }) {
   const session = await getSession();
   if (!session) redirect("/login");
+
+  // For OWNER users: check if subscription is active
+  if (session.role === "OWNER") {
+    try {
+      const userData = await apiFetch("/api/auth/me");
+      const user = userData?.data?.user;
+      if (user && user.subscriptionStatus !== "active") {
+        redirect("/subscribe");
+      }
+    } catch {
+      // If API call fails, allow access (don't block on API errors)
+    }
+  }
 
   return (
     <div className="flex h-screen bg-[#F8F8F8] overflow-hidden">
