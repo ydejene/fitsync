@@ -50,3 +50,28 @@ export default function GoogleTranslate() {
       if (lang && lang !== "en") setCurrentLang(lang);
     }
   }, []);
+
+    // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  function switchLanguage(langCode: string) {
+    setCurrentLang(langCode);
+    setOpen(false);
+
+    // Trigger Google Translate
+    const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement;
+    if (combo) {
+      combo.value = langCode;
+      combo.dispatchEvent(new Event("change"));
+    }
+  }
+
+  const current = languages.find((l) => l.code === currentLang) || languages[0];
