@@ -120,7 +120,7 @@ export default function StaffDetailPage() {
   }
 
   const initials = (staff.full_name || "S M").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-  const joinedDate = new Intl.DateTimeFormat("en-ET", { year: "numeric", month: "long", day: "numeric" }).format(new Date(staff.created_at));
+  const joinedDate = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(new Date(staff.created_at));
 
   return (
     <div className="max-w-3xl">

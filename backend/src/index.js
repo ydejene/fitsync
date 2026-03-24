@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const authRoutes           = require("./routes/auth.routes");
 const memberRoutes         = require("./routes/member.routes");
@@ -13,6 +14,8 @@ const dashboardRoutes      = require("./routes/dashboard.routes");
 const staffRoutes          = require("./routes/staff.routes");
 const analyticsRoutes      = require("./routes/analytics.routes");
 const auditRoutes          = require("./routes/audit.routes");
+const insightsRoutes   = require("./routes/insights.routes");
+const userRoutes       = require("./routes/user.routes");
 const telebirrRoutes       = require("./routes/telebirr.routes");
 const subscriptionRoutes   = require("./routes/subscription.routes");
 const { requireActiveSubscription } = require("./middleware/subscription.middleware");
@@ -31,6 +34,15 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// ── Security Headers for Google Auth ──
+app.use((_req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  next();
+});
+
+// ── Static Files ──
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 // ── Public Routes (no subscription check) ──
 app.use("/api/auth",               authRoutes);
 app.use("/api/telebirr",           telebirrRoutes);
@@ -45,6 +57,8 @@ app.use("/api/dashboard",   requireActiveSubscription, dashboardRoutes);
 app.use("/api/staff",       requireActiveSubscription, staffRoutes);
 app.use("/api/analytics",   requireActiveSubscription, analyticsRoutes);
 app.use("/api/audit",       requireActiveSubscription, auditRoutes);
+app.use("/api/insights",    insightsRoutes);
+app.use("/api/users",       userRoutes);
 
 // ── Health check ──
 app.get("/api/health", (_req, res) => {

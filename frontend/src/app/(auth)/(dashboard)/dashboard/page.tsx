@@ -92,12 +92,11 @@ export default async function DashboardPage() {
         <div>
           <h1 className="page-title">Dashboard</h1>
           <p className="text-sm text-[#6B6B6B] mt-0.5">Overview of your gym at a glance</p>
-          <p className="text-xs text-[#9CA3AF]">የጂምዎ አጠቃላይ እይታ</p>
         </div>
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-8">
         {cards.map((card) => (
           <div key={card.label} className="stat-card p-5 bg-white rounded-2xl border border-[#E5E5E5] shadow-sm">
             <div className="flex items-start justify-between">
@@ -119,7 +118,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick action cards */}
-      <div className="grid md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
         <div className="card p-6 bg-white rounded-2xl border border-[#E5E5E5]">
           <h2 className="font-[family-name:var(--font-barlow)] text-lg font-semibold text-[#1A1A1A] mb-4">
             Quick Actions

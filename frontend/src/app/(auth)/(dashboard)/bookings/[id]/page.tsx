@@ -204,8 +204,8 @@ export default function ManageClassPage() {
   const activeBookings = bookings.filter((b) => !b.cancelled);
   const cancelledBookings = bookings.filter((b) => b.cancelled);
 
-  const fmtDate = new Intl.DateTimeFormat("en-ET", { weekday: "long", year: "numeric", month: "long", day: "numeric" }).format(scheduleDate);
-  const fmtTime = new Intl.DateTimeFormat("en-ET", { hour: "2-digit", minute: "2-digit" }).format(scheduleDate);
+  const fmtDate = new Intl.DateTimeFormat("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }).format(scheduleDate);
+  const fmtTime = new Intl.DateTimeFormat("en-US", { hour: "2-digit", minute: "2-digit" }).format(scheduleDate);
 
   return (
     <div>
@@ -266,7 +266,7 @@ export default function ManageClassPage() {
           </div>
 
           {/* Stats */}
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             <div className="bg-[#FAFAFA] rounded-xl px-5 py-3 text-center min-w-[90px]">
               <p className="text-2xl font-bold text-[#1A1A1A]">{booked}</p>
               <p className="text-[10px] text-[#9CA3AF] uppercase font-bold mt-0.5">Booked</p>
@@ -356,7 +356,7 @@ export default function ManageClassPage() {
                       </td>
                       <td className="px-5 py-4 text-[#6B6B6B] hidden md:table-cell">{b.phone || "—"}</td>
                       <td className="px-5 py-4 text-[#6B6B6B] text-xs hidden lg:table-cell">
-                        {new Intl.DateTimeFormat("en-ET", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(b.booked_at))}
+                        {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(b.booked_at))}
                       </td>
                       <td className="px-5 py-4 text-center">
                         <button
