@@ -137,7 +137,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <button type="submit" className="btn-primary w-full justify-center py-3" disabled={loading}>
+            <button type="submit" className="btn-primary w-full justify-center py-3 cursor-pointer" disabled={loading}>
               {loading ? (
                 <><i className="fa-solid fa-spinner fa-spin text-xs" /> Signing in...</>
               ) : (
