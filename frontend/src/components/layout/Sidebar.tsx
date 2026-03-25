@@ -146,7 +146,7 @@ export default function Sidebar({ user, open, onClose }: Props) {
                 href={item.href}
                 onClick={onClose}
                 className={`
-                  flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group
+                  relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group
                   ${isActive
                     ? "bg-[#FFF0EB] text-[#F15A24] font-semibold"
                     : "text-[#6B6B6B] hover:bg-[#F9FAFB] hover:text-[#1A1A1A]"}
