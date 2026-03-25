@@ -148,10 +148,11 @@ export default function Sidebar({ user, open, onClose }: Props) {
                 className={`
                   relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group
                   ${isActive
-                    ? "bg-[#FFF0EB] text-[#F15A24] font-semibold"
-                    : "text-[#6B6B6B] hover:bg-[#F9FAFB] hover:text-[#1A1A1A]"}
+                    ? "bg-[#FFF0EB] text-[#F15A24] font-semibold shadow-sm"
+                    : "text-[#6B6B6B] hover:bg-[#F8F8F8] hover:text-[#1A1A1A] hover:translate-x-1"}
                 `}
               >
+                {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#F15A24] rounded-r-full shadow-sm" />}
                 <div className="w-6 flex justify-center items-center">
                   <i className={`fa-solid ${item.icon} text-sm ${isActive ? "text-[#F15A24]" : "text-[#9CA3AF] group-hover:text-[#1A1A1A]"}`} />
                 </div>
