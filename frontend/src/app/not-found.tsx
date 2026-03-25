@@ -13,7 +13,7 @@ export default function NotFound() {
       role="main"
       aria-labelledby="error-title"
     >
-      <div className="max-w-2xl bg-white p-10 sm:p-16 rounded-3xl shadow-sm border border-[#E5E5E5] flex flex-col items-center">
+      <div role="alert" className="max-w-2xl bg-white p-10 sm:p-16 rounded-3xl shadow-sm border border-[#E5E5E5] flex flex-col items-center">
         {/* Animated Icon Container */}
         <div
           className="w-24 h-24 bg-[#FFF0EB] rounded-full flex items-center justify-center mb-8 relative"
