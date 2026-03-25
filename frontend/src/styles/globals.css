@@ -109,3 +109,8 @@ body {
 .VIpgJd-ZVi9od-l4eHX-hSRGPd {
   display: none !important;
 }
+/* Skeleton Configuration */
+  .btn-danger { @apply inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 active:scale-95 transition-all; }
+  .btn-outline { @apply inline-flex items-center gap-2 px-5 py-2.5 bg-transparent border-2 border-brand-orange text-brand-orange text-sm font-semibold rounded-lg hover:bg-brand-orange-light active:scale-95 transition-all; }
+  .btn-ghost { @apply inline-flex items-center gap-2 px-5 py-2.5 bg-transparent text-text-secondary text-sm font-semibold rounded-lg hover:bg-gray-100 hover:text-text-primary active:scale-95 transition-all; }
+  .card-hover { @apply transition-shadow duration-300 hover:shadow-md; }
