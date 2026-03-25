@@ -296,9 +296,10 @@ The Express app currently exposes the following route groups:
 
 The current backend role model uses:
 
-- `ADMIN`
-- `STAFF`
-- `MEMBER`
+- `ADMIN` (System Administrators)
+- `OWNER` (Gym Owners with active subscriptions)
+- `STAFF` (Gym Staff members)
+- `MEMBER` (Gym Clients/Members)
 
 Current middleware behavior in the repo:
 
