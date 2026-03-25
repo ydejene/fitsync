@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -22,6 +23,37 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+
+  async function handleGoogleSuccess(credentialResponse: any) {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken: credentialResponse.credential }),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || "Google registration failed");
+        setLoading(false);
+        return;
+      }
+
+      const user = data.data.user;
+      if (user.role === "OWNER" && user.subscriptionStatus !== "active") {
+        router.push("/subscribe");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      setError("Failed to register with Google");
+      console.error(err);
+      setLoading(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -198,6 +230,27 @@ export default function RegisterPage() {
                 Sign In
               </Link>
             </p>
+          </div>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-brand-light-gray" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-text-muted">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError("Google login failed")}
+                theme="outline"
+                shape="pill"
+                width="280px"
+              />
+            </div>
           </div>
         </div>
 
