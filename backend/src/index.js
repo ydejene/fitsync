@@ -18,6 +18,7 @@ const insightsRoutes   = require("./routes/insights.routes");
 const userRoutes       = require("./routes/user.routes");
 const telebirrRoutes       = require("./routes/telebirr.routes");
 const subscriptionRoutes   = require("./routes/subscription.routes");
+const { authenticate } = require("./middleware/auth.middleware");
 const { requireActiveSubscription } = require("./middleware/subscription.middleware");
 
 const app = express();
@@ -43,22 +44,30 @@ app.use((_req, res, next) => {
 // ── Static Files ──
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// ── Public Routes (no subscription check) ──
+// ── Public Routes (no authentication required) ──
 app.use("/api/auth",               authRoutes);
 app.use("/api/telebirr",           telebirrRoutes);
 app.use("/api/subscription-plans", subscriptionRoutes);
 
-// ── Protected Routes (require active subscription for OWNER users) ──
-app.use("/api/members",     requireActiveSubscription, memberRoutes);
-app.use("/api/payments",    requireActiveSubscription, paymentRoutes);
-app.use("/api/memberships", requireActiveSubscription, membershipRoutes);
-app.use("/api/bookings",    requireActiveSubscription, bookingRoutes);
-app.use("/api/dashboard",   requireActiveSubscription, dashboardRoutes);
-app.use("/api/staff",       requireActiveSubscription, staffRoutes);
-app.use("/api/analytics",   requireActiveSubscription, analyticsRoutes);
-app.use("/api/audit",       requireActiveSubscription, auditRoutes);
-app.use("/api/insights",    insightsRoutes);
-app.use("/api/users",       userRoutes);
+// ── Protected Routes (AUTHENTICATION REQUIRED) ──
+app.use(authenticate); // Following routes require a valid token
+
+// 1. Account info (no subscription needed to see profile/pay)
+app.use("/api/users", userRoutes);
+
+// 2. Gym Management features (SUBSCRIPTION REQUIRED for Owners)
+const sub_check = requireActiveSubscription;
+
+app.use("/api/dashboard",   sub_check, dashboardRoutes);
+app.use("/api/members",     sub_check, memberRoutes);
+app.use("/api/payments",    sub_check, paymentRoutes);
+app.use("/api/memberships", sub_check, membershipRoutes);
+app.use("/api/bookings",    sub_check, bookingRoutes);
+app.use("/api/staff",       sub_check, staffRoutes);
+app.use("/api/analytics",   sub_check, analyticsRoutes);
+app.use("/api/audit",       sub_check, auditRoutes);
+app.use("/api/insights",    insightsRoutes); // Analytics insights
+
 
 // ── Health check ──
 app.get("/api/health", (_req, res) => {
