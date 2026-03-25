@@ -166,6 +166,14 @@ JWT_SECRET="use_the_shared_or_agreed_dev_secret"
 DATABASE_URL="postgresql://postgres:<your_postgres_password>@localhost:5432/fitsync_db"
 FRONTEND_URL="http://localhost:3000"
 NODE_ENV="development"
+TELEBIRR_FABRIC_APP_ID="your_app_id"
+TELEBIRR_APP_SECRET="your_app_secret"
+TELEBIRR_MERCHANT_APP_ID="your_merch_id"
+TELEBIRR_MERCH_CODE="your_merch_code"
+TELEBIRR_PRIVATE_KEY="your_private_key"
+GOOGLE_CLIENT_ID="your_google_id"
+GOOGLE_CLIENT_SECRET="your_google_secret"
+
 ```
 
 ### Frontend Env File
