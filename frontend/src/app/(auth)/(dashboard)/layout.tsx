@@ -16,14 +16,12 @@ export default async function DashboardLayout({
 
   // For OWNER users: check if subscription is active
   if (session.role === "OWNER") {
-    try {
-      const userData = await apiFetch("/api/auth/me");
-      const user = userData?.data?.user;
-      if (user && user.subscriptionStatus !== "active") {
-        redirect("/subscribe");
-      }
-    } catch {
-      // If API call fails, allow access (don't block on API errors)
+    const userData = await apiFetch("/api/auth/me");
+    const user = userData?.data?.user;
+
+    // Redirect if no user found or subscription is not exactly 'active'
+    if (!user || user.subscriptionStatus !== "active") {
+      redirect("/subscribe");
     }
   }
 
