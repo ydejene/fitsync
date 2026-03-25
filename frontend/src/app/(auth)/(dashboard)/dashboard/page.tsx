@@ -9,10 +9,16 @@ async function getStats() {
   try {
     const result = await apiFetch("/api/dashboard");
 
-    if (!result.success) throw new Error(result.message || "Failed to fetch");
+    // If the request failed because of subscription issues (403), fail silently.
+    // The Layout.tsx will take care of the actual redirection to /subscribe.
+    if (!result.success) {
+      if (result.message?.toLowerCase().includes("subscription")) {
+        return null;
+      }
+      throw new Error(result.message || "Failed to fetch");
+    }
 
     const data = result.data;
-
     return {
       totalMembers: data.totalMembers || 0,
       activeMembers: data.activeMembers || 0,
@@ -23,22 +29,29 @@ async function getStats() {
       churnRate: data.churnRate || 0,
     };
   } catch (error) {
-    console.error("Dashboard Fetch Error:", error);
-    return {
-      totalMembers: 0,
-      activeMembers: 0,
-      overdueCount: 0,
-      expiringCount: 0,
-      mrr: 0,
-      lastMrr: 0,
-      churnRate: 0,
-    };
+    // Only log real errors that aren't expected redirects
+    if (!(error instanceof Error && error.message.includes("subscription"))) {
+      console.error("Dashboard Fetch Error:", error);
+    }
+    return null;
   }
 }
 
 export default async function DashboardPage() {
   await requireAdminOrStaff();
-  const stats = await getStats();
+  const rawStats = await getStats();
+
+  // If stats couldn't be fetched (e.g. while redirecting), show empty values gracefully
+  const stats = rawStats || {
+    totalMembers: 0,
+    activeMembers: 0,
+    overdueCount: 0,
+    expiringCount: 0,
+    mrr: 0,
+    lastMrr: 0,
+    churnRate: 0,
+  };
+
   const cards = [
     {
       label: "Total Members",
@@ -59,9 +72,10 @@ export default async function DashboardPage() {
       value: formatETB(stats.mrr),
       icon: "fa-money-bill-trend-up",
       color: "text-orange-600 bg-orange-50",
-      change: stats.lastMrr > 0
-        ? `${((stats.mrr - stats.lastMrr) / stats.lastMrr * 100).toFixed(1)}% vs last month`
-        : null,
+      change:
+        stats.lastMrr > 0
+          ? `${(((stats.mrr - stats.lastMrr) / stats.lastMrr) * 100).toFixed(1)}% vs last month`
+          : null,
     },
     {
       label: "Overdue Payments",

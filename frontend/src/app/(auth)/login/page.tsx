@@ -170,7 +170,13 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-text-muted mt-6">
+        <p className="text-center text-sm text-text-secondary mt-6">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="text-brand-orange font-semibold hover:underline">
+            Create Account
+          </Link>
+        </p>
+        <p className="text-center text-xs text-text-muted mt-2">
           FitSync — Gym Management Platform for Addis Ababa
         </p>
       </div>

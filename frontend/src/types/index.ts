@@ -1,6 +1,6 @@
 // src/types/index.ts
 
-export type Role = "ADMIN" | "STAFF" | "MEMBER";
+export type Role = "ADMIN" | "STAFF" | "MEMBER" | "OWNER";
 export type UserStatus = "ACTIVE" | "INACTIVE";
 export type FeeStatus = "PAID" | "UNPAID" | "OVERDUE";
 export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";

@@ -21,11 +21,15 @@ async function setup() {
         address       TEXT,
         dob           DATE,
         gender        VARCHAR(20) CHECK (gender IN ('MALE','FEMALE','OTHER')),
-        role          VARCHAR(20) NOT NULL DEFAULT 'MEMBER' CHECK (role IN ('ADMIN','STAFF','MEMBER')),
+        role          VARCHAR(20) NOT NULL DEFAULT 'MEMBER' CHECK (role IN ('ADMIN','STAFF','MEMBER','OWNER')),
         status        VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','INACTIVE')),
         profile_photo_url TEXT,
         whatsapp_number   VARCHAR(50),
         emergency_contact TEXT,
+        subscription_status  VARCHAR(20) DEFAULT 'pending' CHECK (subscription_status IN ('pending','active','expired','cancelled')),
+        subscription_plan_id UUID REFERENCES subscription_plans(id),
+        subscription_start   DATE,
+        subscription_end     DATE,
         created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
@@ -71,6 +75,39 @@ async function setup() {
         notes           TEXT,
         paid_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS telebirr_transactions (
+        id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id           UUID NOT NULL REFERENCES users(id),
+        payment_id        UUID REFERENCES payments(id),
+        subscription_plan_id UUID REFERENCES subscription_plans(id),
+        merch_order_id    VARCHAR(64) UNIQUE NOT NULL,
+        prepay_id         VARCHAR(128),
+        payment_order_id  VARCHAR(100),
+        total_amount      NUMERIC(10,2) NOT NULL,
+        status            VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','success','failed','timeout')),
+        request_payload   JSONB,
+        response_payload  JSONB,
+        webhook_payload   JSONB,
+        created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS subscription_plans (
+        id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name          VARCHAR(100) UNIQUE NOT NULL,
+        description   TEXT,
+        price_etb     NUMERIC(10,2) NOT NULL,
+        billing_cycle VARCHAR(20) NOT NULL CHECK (billing_cycle IN ('MONTHLY','HALF_YEARLY','YEARLY')),
+        duration_days INT NOT NULL,
+        features      TEXT[],
+        is_active     BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `);
 
@@ -174,6 +211,9 @@ async function setup() {
     await client.query(`CREATE INDEX IF NOT EXISTS idx_payments_method        ON payments(payment_method);`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_payments_membership    ON payments(membership_id);`);
 
+    // Telebirr indexes
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_telebirr_merch_order ON telebirr_transactions(merch_order_id);`);
+
     // Bookings indexes
     await client.query(`CREATE INDEX IF NOT EXISTS idx_bookings_booked_at     ON bookings(booked_at);`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_bookings_cancelled     ON bookings(cancelled);`);
@@ -184,6 +224,16 @@ async function setup() {
     console.log("Indexes created.");
 
     // ── Seed data ──
+    // B2B Subscription Plans
+    await client.query(`
+      INSERT INTO subscription_plans (name, description, price_etb, billing_cycle, duration_days, features)
+      VALUES
+        ('Monthly',     'Monthly subscription to FitSync platform',  2500, 'MONTHLY',     30,  ARRAY['Full Dashboard', 'Up to 100 Members', 'Payment Tracking', 'Class Scheduling']),
+        ('Half-Yearly', '6-month subscription to FitSync platform', 12000, 'HALF_YEARLY', 180, ARRAY['Full Dashboard', 'Up to 500 Members', 'Payment Tracking', 'Class Scheduling', 'Analytics', 'Priority Support']),
+        ('Yearly',      'Annual subscription to FitSync platform',  20000, 'YEARLY',      365, ARRAY['Full Dashboard', 'Unlimited Members', 'Payment Tracking', 'Class Scheduling', 'Advanced Analytics', 'Priority Support', 'Custom Branding'])
+      ON CONFLICT (name) DO NOTHING;
+    `);
+
     // Plans
     await client.query(`
       INSERT INTO plans (name, name_am, price_etb, billing_cycle, duration_days, features)
@@ -239,7 +289,7 @@ async function seedInsightsData(client, passwordHash) {
   }
 
   const basicPlan = plans[0];
-  const proPlan   = plans[1];
+  const proPlan = plans[1];
   const elitePlan = plans[2];
 
   // Helper: random date within range
@@ -258,46 +308,46 @@ async function seedInsightsData(client, passwordHash) {
 
   // ── 1. Create members ──
   const memberNames = [
-    { name: "Abebe Kebede",     gender: "MALE",   dob: "1995-03-15" },
-    { name: "Tigist Haile",     gender: "FEMALE", dob: "1998-07-22" },
-    { name: "Dawit Mekonnen",   gender: "MALE",   dob: "1990-11-08" },
-    { name: "Hanna Tesfaye",    gender: "FEMALE", dob: "2000-01-30" },
-    { name: "Yonas Bekele",     gender: "MALE",   dob: "1988-05-12" },
-    { name: "Sara Worku",       gender: "FEMALE", dob: "1997-09-05" },
-    { name: "Bereket Tadesse",  gender: "MALE",   dob: "1992-12-20" },
-    { name: "Meron Alemu",      gender: "FEMALE", dob: "2001-04-18" },
-    { name: "Solomon Girma",    gender: "MALE",   dob: "1985-08-25" },
-    { name: "Bethlehem Desta",  gender: "FEMALE", dob: "1999-06-14" },
-    { name: "Nahom Zewdu",      gender: "MALE",   dob: "1993-02-28" },
-    { name: "Kidist Assefa",    gender: "FEMALE", dob: "1996-10-11" },
-    { name: "Ermias Wolde",     gender: "MALE",   dob: "2002-03-03" },
-    { name: "Selamawit Biru",   gender: "FEMALE", dob: "1991-07-09" },
-    { name: "Henok Getachew",   gender: "MALE",   dob: "1987-01-16" },
-    { name: "Liya Solomon",     gender: "FEMALE", dob: "2003-11-27" },
-    { name: "Mulugeta Kassa",   gender: "MALE",   dob: "1994-04-06" },
-    { name: "Tsion Hailu",      gender: "FEMALE", dob: "1989-08-19" },
-    { name: "Robel Abera",      gender: "MALE",   dob: "1986-12-02" },
-    { name: "Feven Negash",     gender: "FEMALE", dob: "2000-05-21" },
-    { name: "Amanuel Yimer",    gender: "MALE",   dob: "1997-09-30" },
-    { name: "Rediet Demeke",    gender: "FEMALE", dob: "1995-02-14" },
-    { name: "Tewodros Mengistu",gender: "MALE",   dob: "1983-06-08" },
-    { name: "Mahlet Birhanu",   gender: "FEMALE", dob: "2001-10-25" },
-    { name: "Yared Tefera",     gender: "MALE",   dob: "1998-01-05" },
-    { name: "Helen Tadesse",    gender: "FEMALE", dob: "1990-07-17" },
-    { name: "Girma Abebe",      gender: "MALE",   dob: "1984-11-03" },
-    { name: "Bezawit Asfaw",    gender: "FEMALE", dob: "1999-03-22" },
-    { name: "Dawit Sahle",      gender: "MALE",   dob: "1996-08-09" },
+    { name: "Abebe Kebede", gender: "MALE", dob: "1995-03-15" },
+    { name: "Tigist Haile", gender: "FEMALE", dob: "1998-07-22" },
+    { name: "Dawit Mekonnen", gender: "MALE", dob: "1990-11-08" },
+    { name: "Hanna Tesfaye", gender: "FEMALE", dob: "2000-01-30" },
+    { name: "Yonas Bekele", gender: "MALE", dob: "1988-05-12" },
+    { name: "Sara Worku", gender: "FEMALE", dob: "1997-09-05" },
+    { name: "Bereket Tadesse", gender: "MALE", dob: "1992-12-20" },
+    { name: "Meron Alemu", gender: "FEMALE", dob: "2001-04-18" },
+    { name: "Solomon Girma", gender: "MALE", dob: "1985-08-25" },
+    { name: "Bethlehem Desta", gender: "FEMALE", dob: "1999-06-14" },
+    { name: "Nahom Zewdu", gender: "MALE", dob: "1993-02-28" },
+    { name: "Kidist Assefa", gender: "FEMALE", dob: "1996-10-11" },
+    { name: "Ermias Wolde", gender: "MALE", dob: "2002-03-03" },
+    { name: "Selamawit Biru", gender: "FEMALE", dob: "1991-07-09" },
+    { name: "Henok Getachew", gender: "MALE", dob: "1987-01-16" },
+    { name: "Liya Solomon", gender: "FEMALE", dob: "2003-11-27" },
+    { name: "Mulugeta Kassa", gender: "MALE", dob: "1994-04-06" },
+    { name: "Tsion Hailu", gender: "FEMALE", dob: "1989-08-19" },
+    { name: "Robel Abera", gender: "MALE", dob: "1986-12-02" },
+    { name: "Feven Negash", gender: "FEMALE", dob: "2000-05-21" },
+    { name: "Amanuel Yimer", gender: "MALE", dob: "1997-09-30" },
+    { name: "Rediet Demeke", gender: "FEMALE", dob: "1995-02-14" },
+    { name: "Tewodros Mengistu", gender: "MALE", dob: "1983-06-08" },
+    { name: "Mahlet Birhanu", gender: "FEMALE", dob: "2001-10-25" },
+    { name: "Yared Tefera", gender: "MALE", dob: "1998-01-05" },
+    { name: "Helen Tadesse", gender: "FEMALE", dob: "1990-07-17" },
+    { name: "Girma Abebe", gender: "MALE", dob: "1984-11-03" },
+    { name: "Bezawit Asfaw", gender: "FEMALE", dob: "1999-03-22" },
+    { name: "Dawit Sahle", gender: "MALE", dob: "1996-08-09" },
     { name: "Eyerusalem Worku", gender: "FEMALE", dob: "2002-12-14" },
     { name: "Mikias Gebremedhin", gender: "MALE", dob: "1993-05-29" },
-    { name: "Aster Mulatu",     gender: "FEMALE", dob: "1988-04-16" },
-    { name: "Biniam Tekle",     gender: "MALE",   dob: "2000-09-01" },
-    { name: "Ruth Yohannes",    gender: "FEMALE", dob: "1991-01-20" },
-    { name: "Kaleb Desta",      gender: "MALE",   dob: "1987-06-12" },
-    { name: "Winta Berhe",      gender: "FEMALE", dob: "1994-10-07" },
-    { name: "Abenezer Fikre",   gender: "MALE",   dob: "2003-02-18" },
-    { name: "Rahel Gebre",      gender: "FEMALE", dob: "1992-07-31" },
-    { name: "Filmon Teklu",     gender: "MALE",   dob: "1985-03-11" },
-    { name: "Yodit Alem",       gender: "FEMALE", dob: "1997-11-26" },
+    { name: "Aster Mulatu", gender: "FEMALE", dob: "1988-04-16" },
+    { name: "Biniam Tekle", gender: "MALE", dob: "2000-09-01" },
+    { name: "Ruth Yohannes", gender: "FEMALE", dob: "1991-01-20" },
+    { name: "Kaleb Desta", gender: "MALE", dob: "1987-06-12" },
+    { name: "Winta Berhe", gender: "FEMALE", dob: "1994-10-07" },
+    { name: "Abenezer Fikre", gender: "MALE", dob: "2003-02-18" },
+    { name: "Rahel Gebre", gender: "FEMALE", dob: "1992-07-31" },
+    { name: "Filmon Teklu", gender: "MALE", dob: "1985-03-11" },
+    { name: "Yodit Alem", gender: "FEMALE", dob: "1997-11-26" },
   ];
 
   const paymentMethods = ["TELEBIRR", "CBE_BIRR", "CASH", "CARD"];
@@ -345,7 +395,7 @@ async function seedInsightsData(client, passwordHash) {
   // Plan distribution: 50% Basic, 30% Pro, 20% Elite
   const planWeights = [
     { plan: basicPlan, weight: 0.50 },
-    { plan: proPlan,   weight: 0.80 },
+    { plan: proPlan, weight: 0.80 },
     { plan: elitePlan, weight: 1.00 },
   ];
 
@@ -445,14 +495,14 @@ async function seedInsightsData(client, passwordHash) {
 
   // ── 3. Create classes ──
   const classNames = [
-    { name: "Yoga Flow",        nameAm: "ዮጋ",       instructor: "Coach Hana",     location: "Studio A" },
-    { name: "HIIT Blast",       nameAm: "ሂት",       instructor: "Coach Dawit",    location: "Main Floor" },
-    { name: "Spin Cycle",       nameAm: "ስፒን",      instructor: "Coach Sara",     location: "Spin Room" },
-    { name: "Strength Training",nameAm: "ጥንካሬ",     instructor: "Coach Yonas",    location: "Weight Room" },
-    { name: "Boxing Basics",    nameAm: "ቦክስ",      instructor: "Coach Bereket",  location: "Ring Area" },
-    { name: "Pilates Core",     nameAm: "ፒላቲስ",    instructor: "Coach Meron",    location: "Studio B" },
-    { name: "CrossFit WOD",     nameAm: "ክሮስፊት",   instructor: "Coach Solomon",  location: "CrossFit Zone" },
-    { name: "Zumba Dance",      nameAm: "ዙምባ",      instructor: "Coach Bethlehem",location: "Studio A" },
+    { name: "Yoga Flow", nameAm: "ዮጋ", instructor: "Coach Hana", location: "Studio A" },
+    { name: "HIIT Blast", nameAm: "ሂት", instructor: "Coach Dawit", location: "Main Floor" },
+    { name: "Spin Cycle", nameAm: "ስፒን", instructor: "Coach Sara", location: "Spin Room" },
+    { name: "Strength Training", nameAm: "ጥንካሬ", instructor: "Coach Yonas", location: "Weight Room" },
+    { name: "Boxing Basics", nameAm: "ቦክስ", instructor: "Coach Bereket", location: "Ring Area" },
+    { name: "Pilates Core", nameAm: "ፒላቲስ", instructor: "Coach Meron", location: "Studio B" },
+    { name: "CrossFit WOD", nameAm: "ክሮስፊት", instructor: "Coach Solomon", location: "CrossFit Zone" },
+    { name: "Zumba Dance", nameAm: "ዙምባ", instructor: "Coach Bethlehem", location: "Studio A" },
   ];
 
   const classIds = [];

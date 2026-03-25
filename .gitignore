@@ -93,3 +93,5 @@ ehthumbs.db
 *.pem
 
 /resources
+/Telebirr_API_Docs.md
+/.next

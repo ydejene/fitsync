@@ -64,9 +64,13 @@ This section is deliberately scoped to what is present in the repository today.
 - analytics
 - audit log
 
-### Payments Note
+### Payments & Subscriptions
 
-Payment-related pages and backend routes exist in the codebase, but this README does not claim verified payment gateway integration from the current repository state alone.
+Telebirr B2B Web Checkout is integrated for gym owner subscriptions. The flow includes:
+- Plan selection and Telebirr payment initiation.
+- Webhook processing for automatic subscription activation.
+- Real-time payment status polling on the frontend.
+
 
 ## Tech Stack
 
@@ -162,6 +166,14 @@ JWT_SECRET="use_the_shared_or_agreed_dev_secret"
 DATABASE_URL="postgresql://postgres:<your_postgres_password>@localhost:5432/fitsync_db"
 FRONTEND_URL="http://localhost:3000"
 NODE_ENV="development"
+TELEBIRR_FABRIC_APP_ID="your_app_id"
+TELEBIRR_APP_SECRET="your_app_secret"
+TELEBIRR_MERCHANT_APP_ID="your_merch_id"
+TELEBIRR_MERCH_CODE="your_merch_code"
+TELEBIRR_PRIVATE_KEY="your_private_key"
+GOOGLE_CLIENT_ID="your_google_id"
+GOOGLE_CLIENT_SECRET="your_google_secret"
+
 ```
 
 ### Frontend Env File
@@ -284,9 +296,10 @@ The Express app currently exposes the following route groups:
 
 The current backend role model uses:
 
-- `ADMIN`
-- `STAFF`
-- `MEMBER`
+- `ADMIN` (System Administrators)
+- `OWNER` (Gym Owners with active subscriptions)
+- `STAFF` (Gym Staff members)
+- `MEMBER` (Gym Clients/Members)
 
 Current middleware behavior in the repo:
 
@@ -300,7 +313,11 @@ Current middleware behavior in the repo:
 - payment gateway integration should not be treated as verified from this README alone
 - there is no committed `.env.example` file yet
 - there is no root-level automated test setup yet
-- `frontend/README.md` is still the default scaffold README
+### Telebirr Sandbox Notes
+The Ethio Telecom Telebirr Sandbox is used in development. Note:
+- Error `49401024991` indicates periodic sandbox unavailability (external).
+- The `NODE_TLS_REJECT_UNAUTHORIZED=0` flag is required because the sandbox uses an untrusted SSL leaf certificate.
+- When testing on a local network, ensure `NEXT_PUBLIC_BACKEND_URL` and `TELEBIRR_REDIRECT_URL` use your local IP instead of `localhost`.
 
 ## Contribution Workflow
 
