@@ -28,6 +28,11 @@ const pool = require("../config/db");
  */
 async function requireActiveSubscription(req, res, next) {
   try {
+    // Safety check: If no user is present, we cannot check subscription
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: "Authentication required" });
+    }
+
     // Only enforce for OWNER role — ADMIN/STAFF/MEMBER bypass
     if (req.user.role !== "OWNER") {
       return next();
