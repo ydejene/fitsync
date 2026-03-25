@@ -1,6 +1,6 @@
 // src/types/index.ts
 
-export type Role = "ADMIN" | "STAFF" | "MEMBER";
+export type Role = "ADMIN" | "STAFF" | "MEMBER" | "OWNER";
 export type UserStatus = "ACTIVE" | "INACTIVE";
 export type FeeStatus = "PAID" | "UNPAID" | "OVERDUE";
 export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
@@ -23,6 +23,8 @@ export interface User {
   profilePhotoUrl?: string;
   createdAt: string;
   updatedAt: string;
+  subscriptionStatus?: "pending" | "active" | "expired" | "cancelled";
+  subscriptionEnd?: string;
 }
 
 export interface Plan {
@@ -131,6 +133,8 @@ export interface AuthUser {
   gender?: Gender;
   whatsappNumber?: string;
   emergencyContact?: string;
+  subscriptionStatus?: "pending" | "active" | "expired" | "cancelled";
+  subscriptionEnd?: string;
   permissions?: StaffPermissions;
 }
 
