@@ -1,0 +1,1 @@
+export default function DashboardLoading() { return (<div className="w-full h-full p-4 sm:p-6 animate-pulse" aria-busy="true"></div>); }
