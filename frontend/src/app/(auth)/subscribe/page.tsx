@@ -29,17 +29,52 @@ export default function SubscribePage() {
 
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
+  // Force actual reload if navigated back from Telebirr (handles bfcache)
+  useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
+
   // Fetch available subscription plans on mount
   useEffect(() => {
+    let active = true;
+    const timeout = setTimeout(() => {
+      if (active && loading) {
+        setLoading(false);
+        setError("Plans are taking too long to load. Is your backend running?");
+      }
+    }, 15000); // 15-second safety net
+
     fetch(`${BACKEND_URL}/api/subscription-plans`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.success) setPlans(data.data);
-        else setError("Failed to load plans");
+        if (!active) return;
+        if (data.success) {
+          setPlans(data.data);
+          setError("");
+        } else {
+          setError(data.message || "Failed to load plans");
+        }
       })
-      .catch(() => setError("Cannot connect to server"))
-      .finally(() => setLoading(false));
-  }, [BACKEND_URL]);
+      .catch((err) => {
+        if (!active) return;
+        setError("Cannot connect to server. Check your network.");
+        console.error("Fetch plans error:", err);
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+          clearTimeout(timeout);
+        }
+      });
+
+    return () => { active = false; clearTimeout(timeout); };
+  }, [BACKEND_URL]); // Removed loading from deps to avoid infinite loop
 
   /**
    * Initiates telebirr payment for the selected plan.
