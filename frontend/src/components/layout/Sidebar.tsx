@@ -129,7 +129,7 @@ export default function Sidebar({ user, open, onClose }: Props) {
           {/* Close button — mobile only */}
           <button
             onClick={onClose}
-            className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#6B6B6B] hover:bg-[#F5F5F5]"
+            className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#6B6B6B] hover:bg-[#F5F5F5] cursor-pointer"
           >
             <i className="fa-solid fa-xmark text-sm" />
           </button>
@@ -166,7 +166,7 @@ export default function Sidebar({ user, open, onClose }: Props) {
           <button
             type="button"
             onClick={handleLogout}
-            className="sidebar-link w-full text-left text-red-500 hover:bg-red-50 hover:text-red-600"
+            className="sidebar-link w-full text-left text-red-500 hover:bg-red-50 hover:text-red-600 cursor-pointer"
           >
             <i className="fa-solid fa-arrow-right-from-bracket w-4 text-center text-sm" />
             <span>Sign Out</span>

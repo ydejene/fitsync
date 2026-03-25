@@ -18,7 +18,7 @@ export default function TopBar({ user, onMenuClick }: Props) {
       {/* Hamburger — mobile only */}
       <button
         onClick={onMenuClick}
-        className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-[#6B6B6B] hover:bg-[#F8F8F8] transition-colors"
+        className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-[#6B6B6B] hover:bg-[#F8F8F8] transition-colors cursor-pointer"
       >
         <i className="fa-solid fa-bars text-sm" />
       </button>
