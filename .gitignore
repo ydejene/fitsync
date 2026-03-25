@@ -22,6 +22,7 @@ backend/.env
 backend/.env.local
 backend/.env.development
 backend/.env.production
+backend/uploads
 
 # ==============================
 
@@ -90,3 +91,5 @@ Desktop.ini
 ehthumbs.db
 
 *.pem
+
+/resources
