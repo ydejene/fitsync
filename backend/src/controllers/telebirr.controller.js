@@ -74,11 +74,25 @@ async function initiatePayment(req, res) {
     );
 
     // Call Telebirr API: get token → create order → generate checkout URL
-    const orderResult = await telebirrService.createOrder({
-      title,
-      amount,
-      merchOrderId,
-    });
+    let orderResult;
+    try {
+      orderResult = await telebirrService.createOrder({
+        title,
+        amount,
+        merchOrderId,
+      });
+    } catch (apiErr) {
+      // Catch specific Ethio Telecom Sandbox outage (Southbound service unavailable)
+      if (apiErr.message?.includes("49401024991")) {
+        await client.query("ROLLBACK");
+        return res.status(503).json({
+          success: false,
+          message: "Telebirr Sandbox service is currently unavailable. This is an external issue with Ethio Telecom. Please try again in 5 minutes.",
+          code: "TELEBIRR_SANDBOX_DOWN"
+        });
+      }
+      throw apiErr; // Let the main catch block handle other errors
+    }
 
     // Update transaction with prepay_id and API response
     await client.query(
