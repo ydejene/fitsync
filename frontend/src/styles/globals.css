@@ -87,3 +87,25 @@
     @apply block text-xs font-semibold uppercase tracking-wide text-text-muted mb-1.5;
   }
 }
+
+/* Hide all Google Translate UI */
+.goog-te-banner-frame,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+  position: static !important;
+}
+
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-ZVi9od-l4eHX-hSRGPd {
+  display: none !important;
+}
