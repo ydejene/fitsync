@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { getInitials } from "@/utils";
 import type { AuthUser } from "@/types";
+import GoogleTranslate from "@/components/GoogleTranslate";
 
 interface Props {
   user: AuthUser;
@@ -26,6 +27,7 @@ export default function TopBar({ user, onMenuClick }: Props) {
       <div className="hidden lg:block" />
 
       <div className="flex items-center gap-3 sm:gap-4">
+        <GoogleTranslate />
         {/* User info */}
         <Link href="/profile" className="flex items-center gap-3 hover:bg-[#F8F8F8] p-1.5 rounded-xl transition-colors group">
           <div className="text-right hidden sm:block">

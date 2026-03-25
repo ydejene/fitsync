@@ -1,5 +1,5 @@
 // src/app/layout.tsx
-
+import GoogleTranslate from "@/components/GoogleTranslate";
 import type { Metadata } from "next";
 import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import "@/styles/globals.css";
