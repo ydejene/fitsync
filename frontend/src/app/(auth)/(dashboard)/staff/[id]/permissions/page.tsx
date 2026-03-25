@@ -17,9 +17,9 @@ const defaultPermissions: StaffPermissions = {
 const permissionLabels: Record<keyof StaffPermissions, { label: string; desc: string; icon: string }> = {
   canManageMembers: { label: "Manage Members", desc: "Add, edit, and deactivate member accounts", icon: "fa-users" },
   canManagePayments: { label: "Manage Payments", desc: "Record and modify payment transactions", icon: "fa-money-bill-wave" },
-  canManageBookings: { label: "Manage Bookings", desc: "Create, cancel, and update class bookings", icon: "fa-calendar-days" },
-  canViewReports: { label: "View Reports", desc: "Access financial reports and export data", icon: "fa-chart-line" },
-  canManagePlans: { label: "Manage Plans", desc: "Create and update membership plan details", icon: "fa-id-card" },
+  canManageBookings: { label: "Manage Classes", desc: "Create, cancel, and update class schedules and bookings", icon: "fa-calendar-days" },
+  canViewReports: { label: "View Insights", desc: "Access financial insights and export data", icon: "fa-chart-pie" },
+  canManagePlans: { label: "Manage Memberships", desc: "Create and update user enrollments and subscriptions", icon: "fa-id-card" },
 };
 
 export default function StaffPermissionsPage() {

@@ -18,7 +18,7 @@ export default function DashboardShell({ user, children }: Props) {
   return (
     <div className="flex h-screen bg-[#F8F8F8] overflow-hidden">
       <Sidebar
-        role={user.role}
+        user={user}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />

@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { Role } from "@/types";
+import type { Role, AuthUser } from "@/types";
 import { clientFetch } from "@/lib/api";
 
 const navItems = [
@@ -71,18 +71,28 @@ const navItems = [
 ];
 
 interface Props {
-  role: Role;
+  user: AuthUser;
   open: boolean;
   onClose: () => void;
 }
 
-export default function Sidebar({ role, open, onClose }: Props) {
+export default function Sidebar({ user, open, onClose }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const visible = navItems.filter((item) =>
-    item.roles.includes(role)
-  );
+  const visible = navItems.filter((item) => {
+    if (!item.roles.includes(user.role)) return false;
+
+    if (user.role === "STAFF" && user.permissions) {
+      if (item.label === "Members" && !user.permissions.canManageMembers) return false;
+      if (item.label === "Memberships" && !user.permissions.canManagePlans) return false;
+      if (item.label === "Payments" && !user.permissions.canManagePayments) return false;
+      if (item.label === "Classes" && !user.permissions.canManageBookings) return false;
+      if (item.label === "Insights" && !user.permissions.canViewReports) return false;
+    }
+    
+    return true;
+  });
 
   async function handleLogout() {
     await clientFetch("/api/auth/logout", { method: "POST" });
@@ -119,7 +129,7 @@ export default function Sidebar({ role, open, onClose }: Props) {
           {/* Close button — mobile only */}
           <button
             onClick={onClose}
-            className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#6B6B6B] hover:bg-[#F5F5F5]"
+            className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#6B6B6B] hover:bg-[#F5F5F5] cursor-pointer"
           >
             <i className="fa-solid fa-xmark text-sm" />
           </button>
@@ -156,7 +166,7 @@ export default function Sidebar({ role, open, onClose }: Props) {
           <button
             type="button"
             onClick={handleLogout}
-            className="sidebar-link w-full text-left text-red-500 hover:bg-red-50 hover:text-red-600"
+            className="sidebar-link w-full text-left text-red-500 hover:bg-red-50 hover:text-red-600 cursor-pointer"
           >
             <i className="fa-solid fa-arrow-right-from-bracket w-4 text-center text-sm" />
             <span>Sign Out</span>

@@ -5,11 +5,35 @@ const { OAuth2Client } = require("google-auth-library");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+async function getStaffPermissionsForUser(userId) {
+  const pResult = await pool.query(
+    "SELECT new_value FROM audit_logs WHERE entity_type='staff_permissions' AND entity_id=$1 ORDER BY created_at DESC LIMIT 1",
+    [userId]
+  );
+  const defaults = { 
+    canManageMembers: false, 
+    canManagePayments: false, 
+    canManageBookings: false, 
+    canViewReports: false, 
+    canManagePlans: false 
+  };
+  if (!pResult.rows[0]) return defaults;
+  
+  const raw = pResult.rows[0].new_value;
+  return {
+    canManageMembers: raw.canManageMembers ?? raw.manageMembers ?? false,
+    canManagePayments: raw.canManagePayments ?? raw.managePayments ?? false,
+    canManageBookings: raw.canManageBookings ?? raw.manageBookings ?? false,
+    canViewReports: raw.canViewReports ?? raw.viewReports ?? false,
+    canManagePlans: raw.canManagePlans ?? raw.managePlans ?? false,
+  };
+}
+
 /**
  * Helper to format user object for responses
  */
-function formatUserResponse(user) {
-  return {
+function formatUserResponse(user, permissions) {
+  const result = {
     id: user.id,
     fullName: user.full_name,
     email: user.email,
@@ -24,6 +48,10 @@ function formatUserResponse(user) {
     subscriptionStatus: user.subscription_status,
     subscriptionEnd: user.subscription_end,
   };
+  if (permissions !== undefined) {
+    result.permissions = permissions;
+  }
+  return result;
 }
 
 // Common SELECT fields for user
@@ -134,13 +162,19 @@ async function login(req, res) {
     if (!valid)
       return res.status(401).json({ success: false, message: "Invalid credentials" });
 
+    let permissions = undefined;
+    if (user.role === 'STAFF') {
+      permissions = await getStaffPermissionsForUser(user.id);
+    }
+
     const token = jwt.sign(
       { 
         id: user.id, 
         email: user.email, 
         role: user.role,
         fullName: user.full_name,
-        profilePhotoUrl: user.profile_photo_url
+        profilePhotoUrl: user.profile_photo_url,
+        permissions
       },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
@@ -161,7 +195,7 @@ async function login(req, res) {
     res.json({
       success: true,
       message: "Login successful",
-      data: { user: formatUserResponse(user) },
+      data: { user: formatUserResponse(user, permissions) },
     });
   } catch (err) {
     console.error(err);
@@ -222,6 +256,10 @@ async function googleLogin(req, res) {
       }
     }
 
+    let permissions = undefined;
+    if (user.role === 'STAFF') {
+      permissions = await getStaffPermissionsForUser(user.id);
+    }
 
     const token = jwt.sign(
       { 
@@ -229,7 +267,8 @@ async function googleLogin(req, res) {
         email: user.email, 
         role: user.role,
         fullName: user.full_name,
-        profilePhotoUrl: user.profile_photo_url
+        profilePhotoUrl: user.profile_photo_url,
+        permissions
       },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
@@ -250,7 +289,7 @@ async function googleLogin(req, res) {
     res.json({
       success: true,
       message: "Google login successful",
-      data: { user: formatUserResponse(user) },
+      data: { user: formatUserResponse(user, permissions) },
     });
   } catch (err) {
     console.error("Google login error:", err);
@@ -279,9 +318,14 @@ async function me(req, res) {
     if (!user)
       return res.status(404).json({ success: false, message: "User not found" });
 
+    let permissions = undefined;
+    if (user.role === 'STAFF') {
+      permissions = await getStaffPermissionsForUser(user.id);
+    }
+
     res.json({
       success: true,
-      data: { user: formatUserResponse(user) },
+      data: { user: formatUserResponse(user, permissions) },
     });
   } catch (err) {
     console.error(err);
@@ -289,4 +333,4 @@ async function me(req, res) {
   }
 }
 
-module.exports = { register, login, googleLogin, logout, me };
+module.exports = { register, login, googleLogin, logout, me };
