@@ -64,9 +64,13 @@ This section is deliberately scoped to what is present in the repository today.
 - analytics
 - audit log
 
-### Payments Note
+### Payments & Subscriptions
 
-Payment-related pages and backend routes exist in the codebase, but this README does not claim verified payment gateway integration from the current repository state alone.
+Telebirr B2B Web Checkout is integrated for gym owner subscriptions. The flow includes:
+- Plan selection and Telebirr payment initiation.
+- Webhook processing for automatic subscription activation.
+- Real-time payment status polling on the frontend.
+
 
 ## Tech Stack
 
