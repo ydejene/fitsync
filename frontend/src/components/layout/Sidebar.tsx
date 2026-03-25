@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { Role, AuthUser } from "@/types";
+import type { AuthUser } from "@/types";
 import { clientFetch } from "@/lib/api";
 
 const navItems = [
@@ -12,37 +12,37 @@ const navItems = [
     label: "Dashboard",
     href: "/dashboard",
     icon: "fa-gauge-high",
-    roles: ["ADMIN", "STAFF", "MEMBER"],
+    roles: ["ADMIN", "OWNER", "STAFF", "MEMBER"],
   },
   {
     label: "Profile",
     href: "/profile",
     icon: "fa-user-circle",
-    roles: ["ADMIN", "STAFF", "MEMBER"],
+    roles: ["ADMIN", "OWNER", "STAFF", "MEMBER"],
   },
   {
     label: "Members",
     href: "/members",
     icon: "fa-users",
-    roles: ["ADMIN", "STAFF"],
+    roles: ["ADMIN", "OWNER", "STAFF"],
   },
   {
     label: "Memberships",
     href: "/memberships",
     icon: "fa-id-card",
-    roles: ["ADMIN", "STAFF", "MEMBER"],
+    roles: ["ADMIN", "OWNER", "STAFF", "MEMBER"],
   },
   {
     label: "Payments",
     href: "/payments",
     icon: "fa-money-bill-wave",
-    roles: ["ADMIN", "STAFF"],
+    roles: ["ADMIN", "OWNER", "STAFF"],
   },
   {
     label: "Classes",
     href: "/bookings",
     icon: "fa-calendar-days",
-    roles: ["ADMIN", "STAFF", "MEMBER"],
+    roles: ["ADMIN", "OWNER", "STAFF", "MEMBER"],
   },
   {
     label: "Staff",
@@ -54,13 +54,13 @@ const navItems = [
     label: "Insights",
     href: "/insights",
     icon: "fa-chart-pie",
-    roles: ["ADMIN", "STAFF"],
+    roles: ["ADMIN", "OWNER", "STAFF"],
   },
   {
     label: "Analytics",
     href: "/analytics",
     icon: "fa-chart-line",
-    roles: ["ADMIN"],
+    roles: ["ADMIN", "OWNER"],
   },
   {
     label: "Audit Log",
@@ -129,6 +129,8 @@ export default function Sidebar({ user, open, onClose }: Props) {
           {/* Close button — mobile only */}
           <button
             onClick={onClose}
+            type="button"
+            aria-label="Close dashboard navigation"
             className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#6B6B6B] hover:bg-[#F5F5F5] cursor-pointer"
           >
             <i className="fa-solid fa-xmark text-sm" />

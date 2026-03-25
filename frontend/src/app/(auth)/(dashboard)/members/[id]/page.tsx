@@ -1,8 +1,16 @@
 import { requireAdminOrStaff } from "@/lib/auth";
 import { apiFetch } from "@/lib/api.server";
-import { formatDate, formatETB } from "@/utils";
+import { formatDate } from "@/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+interface MemberMembership {
+  id: string;
+  plan_name: string;
+  start_date: string;
+  end_date: string;
+  fee_status: string;
+}
 
 async function getMemberDetails(id: string) {
   const result = await apiFetch(`/api/members/${id}`);
@@ -63,6 +71,10 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
                 <span className="font-medium">{member.address || "—"}</span>
               </div>
               <div className="flex justify-between">
+                <span className="text-[#6B6B6B]">Gender</span>
+                <span className="font-medium">{member.gender || "—"}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-[#6B6B6B]">Joined</span>
                 <span className="font-medium">{formatDate(member.created_at)}</span>
               </div>
@@ -85,7 +97,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F0F0F0]">
-                  {member.memberships?.map((m: any) => (
+                  {member.memberships?.map((m: MemberMembership) => (
                     <tr key={m.id}>
                       <td className="py-4 font-medium">{m.plan_name}</td>
                       <td className="py-4">{formatDate(m.start_date)}</td>

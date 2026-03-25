@@ -1,5 +1,11 @@
 const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
+const {
+  isValidEmail,
+  isValidGender,
+  normalizeOptionalString,
+  normalizeRequiredString,
+} = require("../utils/validation");
 
 // GET /api/members
 async function getMembers(req, res) {
@@ -25,7 +31,7 @@ async function getMembers(req, res) {
     const offsetIdx = params.length;
 
     const { rows: members } = await pool.query(`
-      SELECT u.id, u.full_name, u.email, u.phone, u.status, u.created_at,
+      SELECT u.id, u.full_name, u.email, u.phone, u.gender, u.status, u.created_at,
              p.name AS plan_name, m.end_date, m.fee_status
       FROM users u
       LEFT JOIN memberships m ON m.user_id = u.id
@@ -54,7 +60,7 @@ async function getMembers(req, res) {
 async function getMemberById(req, res) {
   try {
     const { rows } = await pool.query(
-      "SELECT id, full_name, email, phone, address, status, dob, created_at FROM users WHERE id = $1 AND role = 'MEMBER'",
+      "SELECT id, full_name, email, phone, address, gender, status, dob, created_at FROM users WHERE id = $1 AND role = 'MEMBER'",
       [req.params.id]
     );
     if (!rows[0])
@@ -80,9 +86,32 @@ async function getMemberById(req, res) {
 // POST /api/members
 async function createMember(req, res) {
   try {
-    const { fullName, email, phone, password, dateOfBirth, address } = req.body;
-    if (!fullName || !email || !password)
-      return res.status(400).json({ success: false, message: "Full name, email and password required" });
+    const fullName = normalizeRequiredString(req.body.fullName);
+    const email = normalizeRequiredString(req.body.email);
+    const password = normalizeRequiredString(req.body.password);
+    const gender = normalizeRequiredString(req.body.gender);
+    const phone = normalizeOptionalString(req.body.phone);
+    const dateOfBirth = normalizeOptionalString(req.body.dateOfBirth);
+    const address = normalizeOptionalString(req.body.address);
+
+    if (!fullName) {
+      return res.status(400).json({ success: false, message: "Full name is required." });
+    }
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email address is required." });
+    }
+    if (!password) {
+      return res.status(400).json({ success: false, message: "Password is required." });
+    }
+    if (!gender) {
+      return res.status(400).json({ success: false, message: "Gender is required." });
+    }
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
+    if (!isValidGender(gender)) {
+      return res.status(400).json({ success: false, message: "Gender must be MALE, FEMALE, or OTHER." });
+    }
 
     const existing = await pool.query("SELECT id FROM users WHERE email = $1", [email]);
     if (existing.rows[0])
@@ -90,9 +119,10 @@ async function createMember(req, res) {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const { rows } = await pool.query(
-      `INSERT INTO users (full_name, email, password_hash, phone, address, dob, role, status)
-       VALUES ($1,$2,$3,$4,$5,$6,'MEMBER','ACTIVE') RETURNING id, full_name, email, phone, status, created_at`,
-      [fullName, email, passwordHash, phone || null, address || null, dateOfBirth || null]
+      `INSERT INTO users (full_name, email, password_hash, phone, address, dob, gender, role, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,'MEMBER','ACTIVE')
+       RETURNING id, full_name, email, phone, address, dob, gender, status, created_at`,
+      [fullName, email, passwordHash, phone, address, dateOfBirth, gender]
     );
 
     await pool.query(
@@ -110,11 +140,26 @@ async function createMember(req, res) {
 // PATCH /api/members/:id
 async function updateMember(req, res) {
   try {
-    const { fullName, phone, address, status } = req.body;
+    const fullName = normalizeRequiredString(req.body.fullName);
+    const phone = normalizeOptionalString(req.body.phone);
+    const address = normalizeOptionalString(req.body.address);
+    const gender = normalizeRequiredString(req.body.gender);
+    const status = normalizeRequiredString(req.body.status);
+
+    if (!fullName) {
+      return res.status(400).json({ success: false, message: "Full name is required." });
+    }
+    if (!gender) {
+      return res.status(400).json({ success: false, message: "Gender is required." });
+    }
+    if (!isValidGender(gender)) {
+      return res.status(400).json({ success: false, message: "Gender must be MALE, FEMALE, or OTHER." });
+    }
+
     const { rows } = await pool.query(
-      `UPDATE users SET full_name=$1, phone=$2, address=$3, status=$4, updated_at=NOW()
-       WHERE id=$5 RETURNING id, full_name, email, phone, status`,
-      [fullName, phone, address, status, req.params.id]
+      `UPDATE users SET full_name=$1, phone=$2, address=$3, gender=$4, status=$5, updated_at=NOW()
+       WHERE id=$6 RETURNING id, full_name, email, phone, address, gender, status`,
+      [fullName, phone, address, gender, status, req.params.id]
     );
     res.json({ success: true, data: { member: rows[0] }, message: "Member updated" });
   } catch (err) {
