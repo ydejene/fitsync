@@ -1,5 +1,10 @@
 const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
+const {
+  isValidEmail,
+  normalizeOptionalString,
+  normalizeRequiredString,
+} = require("../utils/validation");
 
 // GET /api/staff
 async function getStaff(_req, res) {
@@ -17,9 +22,23 @@ async function getStaff(_req, res) {
 // POST /api/staff
 async function createStaff(req, res) {
   try {
-    const { fullName, email, phone, password } = req.body;
-    if (!fullName || !email || !password)
-      return res.status(400).json({ success: false, message: "Full name, email and password required" });
+    const fullName = normalizeRequiredString(req.body.fullName);
+    const email = normalizeRequiredString(req.body.email);
+    const password = normalizeRequiredString(req.body.password);
+    const phone = normalizeOptionalString(req.body.phone);
+
+    if (!fullName) {
+      return res.status(400).json({ success: false, message: "Full name is required." });
+    }
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email address is required." });
+    }
+    if (!password) {
+      return res.status(400).json({ success: false, message: "Password is required." });
+    }
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
 
     const existing = await pool.query("SELECT id FROM users WHERE email=$1", [email]);
     if (existing.rows[0])
@@ -28,7 +47,7 @@ async function createStaff(req, res) {
     const passwordHash = await bcrypt.hash(password, 10);
     const { rows } = await pool.query(
       "INSERT INTO users (full_name, email, password_hash, phone, role, status) VALUES ($1,$2,$3,$4,'STAFF','ACTIVE') RETURNING id, full_name, email, phone, status",
-      [fullName, email, passwordHash, phone || null]
+      [fullName, email, passwordHash, phone]
     );
     res.status(201).json({ success: true, data: { staff: rows[0] }, message: "Staff account created" });
   } catch (err) {
