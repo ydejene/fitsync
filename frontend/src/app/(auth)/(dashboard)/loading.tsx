@@ -1,1 +1,1 @@
-export default function DashboardLoading() { return (<div className="w-full h-full p-4 sm:p-6 animate-pulse" aria-busy="true"></div>); }
+export default function DashboardLoading() { return (<div className="w-full h-full p-4 sm:p-6 animate-pulse" aria-busy="true"><div className="flex items-center justify-between mb-8"><div><div className="h-8 w-48 bg-[#E5E5E5] rounded-lg mb-2"></div><div className="h-4 w-32 bg-[#F0F0F0] rounded-md"></div></div><div className="h-10 w-32 bg-[#E5E5E5] rounded-xl hidden sm:block"></div></div></div>); }
