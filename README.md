@@ -313,7 +313,11 @@ Current middleware behavior in the repo:
 - payment gateway integration should not be treated as verified from this README alone
 - there is no committed `.env.example` file yet
 - there is no root-level automated test setup yet
-- `frontend/README.md` is still the default scaffold README
+### Telebirr Sandbox Notes
+The Ethio Telecom Telebirr Sandbox is used in development. Note:
+- Error `49401024991` indicates periodic sandbox unavailability (external).
+- The `NODE_TLS_REJECT_UNAUTHORIZED=0` flag is required because the sandbox uses an untrusted SSL leaf certificate.
+- When testing on a local network, ensure `NEXT_PUBLIC_BACKEND_URL` and `TELEBIRR_REDIRECT_URL` use your local IP instead of `localhost`.
 
 ## Contribution Workflow
 
