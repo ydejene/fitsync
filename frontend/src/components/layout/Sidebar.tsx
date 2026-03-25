@@ -167,6 +167,7 @@ export default function Sidebar({ user, open, onClose }: Props) {
           <button
             type="button"
             onClick={handleLogout}
+            aria-label="Securely Sign out"
             className="sidebar-link w-full text-left text-red-500 hover:bg-red-50 hover:text-red-600 cursor-pointer"
           >
             <i className="fa-solid fa-arrow-right-from-bracket w-4 text-center text-sm" />
