@@ -15,12 +15,6 @@ const navItems = [
     roles: ["ADMIN", "STAFF"],
   },
   {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: "fa-gauge-high",
-    roles: ["ADMIN", "STAFF", "MEMBER"],
-  },
-  {
     label: "Profile",
     href: "/profile",
     icon: "fa-user-circle",

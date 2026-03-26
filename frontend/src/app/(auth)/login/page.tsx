@@ -53,7 +53,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/insights");
     } catch (err) {
       setError("Cannot connect to server. Is the backend running?");
       console.error("Login Error:", err);
@@ -79,7 +79,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/insights");
     } catch (err) {
       setError("Failed to login with Google");
       console.error(err);
