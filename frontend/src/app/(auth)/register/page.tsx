@@ -46,7 +46,7 @@ export default function RegisterPage() {
       if (user.role === "OWNER" && user.subscriptionStatus !== "active") {
         router.push("/subscribe");
       } else {
-        router.push("/dashboard");
+        router.push("/insights");
       }
     } catch (err) {
       setError("Failed to register with Google");
