@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import { formatETB } from "@/utils";
 
 export const analyticsMetadata: Metadata = { title: "Analytics" };
-export const metadata: Metadata = { title: "Insights | FitSync" };
+export const metadata: Metadata = { title: "Insights" };
 
 async function getInsightsData() {
   try {
