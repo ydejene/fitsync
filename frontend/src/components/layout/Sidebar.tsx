@@ -9,6 +9,12 @@ import { clientFetch } from "@/lib/api";
 
 const navItems = [
   {
+    label: "Insights",
+    href: "/insights",
+    icon: "fa-chart-pie",
+    roles: ["ADMIN", "STAFF"],
+  },
+  {
     label: "Dashboard",
     href: "/dashboard",
     icon: "fa-gauge-high",
@@ -49,12 +55,6 @@ const navItems = [
     href: "/staff",
     icon: "fa-user-tie",
     roles: ["ADMIN"],
-  },
-  {
-    label: "Insights",
-    href: "/insights",
-    icon: "fa-chart-pie",
-    roles: ["ADMIN", "STAFF"],
   },
   {
     label: "Audit Log",

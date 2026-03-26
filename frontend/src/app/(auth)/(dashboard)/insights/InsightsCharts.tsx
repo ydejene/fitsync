@@ -211,6 +211,29 @@ export default function InsightsCharts({ data, analyticsData }: Props) {
         />
       </div>
 
+      <div className="card p-6 bg-white mb-6 rounded-2xl border border-[#E5E5E5]">
+          <h2 className="font-[family-name:var(--font-barlow)] text-lg font-semibold text-[#1A1A1A] mb-4">
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "Add Member", href: "/members/new", icon: "fa-user-plus" },
+              { label: "Record Payment", href: "/payments/new", icon: "fa-money-bill" },
+              { label: "New Membership", href: "/memberships/new", icon: "fa-id-card" },
+              { label: "Book Class", href: "/bookings/new", icon: "fa-calendar-plus" },
+            ].map((action) => (
+              <a
+                key={action.label}
+                href={action.href}
+                className="flex items-center gap-3 p-3 border border-[#E5E5E5] rounded-lg hover:border-[#F15A24] hover:bg-[#FFF0EB] transition-all group"
+              >
+                <i className={`fa-solid ${action.icon} text-[#9CA3AF] group-hover:text-[#F15A24] text-sm`} />
+                <span className="text-sm font-medium text-[#1A1A1A]">{action.label}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
       {/* ── Tabs + Date Filter ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
