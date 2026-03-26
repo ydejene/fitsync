@@ -12,6 +12,20 @@ async function setup() {
     console.log("Checking and creating tables...");
 
     await client.query(`
+      CREATE TABLE IF NOT EXISTS subscription_plans (
+        id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name          VARCHAR(100) UNIQUE NOT NULL,
+        description   TEXT,
+        price_etb     NUMERIC(10,2) NOT NULL,
+        billing_cycle VARCHAR(20) NOT NULL CHECK (billing_cycle IN ('MONTHLY','HALF_YEARLY','YEARLY')),
+        duration_days INT NOT NULL,
+        features      TEXT[],
+        is_active     BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         full_name     VARCHAR(255) NOT NULL,
@@ -94,20 +108,6 @@ async function setup() {
         webhook_payload   JSONB,
         created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      );
-    `);
-
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS subscription_plans (
-        id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        name          VARCHAR(100) UNIQUE NOT NULL,
-        description   TEXT,
-        price_etb     NUMERIC(10,2) NOT NULL,
-        billing_cycle VARCHAR(20) NOT NULL CHECK (billing_cycle IN ('MONTHLY','HALF_YEARLY','YEARLY')),
-        duration_days INT NOT NULL,
-        features      TEXT[],
-        is_active     BOOLEAN NOT NULL DEFAULT TRUE,
-        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `);
 
