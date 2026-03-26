@@ -120,12 +120,12 @@ export default function Sidebar({ user, open, onClose }: Props) {
       >
         {/* Logo */}
         <div className="h-16 px-5 flex items-center justify-between border-b border-[#E5E5E5]">
-          <div className="flex items-center gap-2.5">
+          <Link href="/dashboard" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity cursor-pointer">
             <div className="w-8 h-8 bg-[#F15A24] rounded-lg flex items-center justify-center shrink-0">
               <i className="fa-solid fa-dumbbell text-white text-xs" />
             </div>
             <span className="font-[family-name:var(--font-barlow)] text-lg font-bold text-[#1A1A1A]">FitSync</span>
-          </div>
+          </Link>
           {/* Close button — mobile only */}
           <button
             onClick={onClose}
