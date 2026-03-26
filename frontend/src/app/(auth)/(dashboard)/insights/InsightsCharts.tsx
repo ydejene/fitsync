@@ -8,12 +8,6 @@ import {
 } from "recharts";
 import { formatETB } from "@/utils";
 
-import { requireAdminOrStaff } from "@/lib/auth";
-import { apiFetch } from "@/lib/api.server";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = { title: "Analytics" };
-
 // ── Color palette ──
 const COLORS = ["#F15A24", "#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#6B7280"];
 const METHOD_COLORS: Record<string, string> = {
@@ -57,19 +51,19 @@ interface InsightsData {
   };
 }
 
-interface Props {
-  data: InsightsData;
+interface AnalyticsData {
+  totalRevenue: number;
+  totalMembers: number;
+  activeMembers: number;
+  overdue: number;
+  monthlyRevenue: Record<string, number>;
+  methodBreakdown: Record<string, number>;
+  planBreakdown: { plan_id: string; count: number }[];
 }
 
-async function getAnalyticsData() {
-  try {
-    const result = await apiFetch("/api/analytics");
-    if (!result.success) throw new Error(result.message || "Failed to fetch analytics");
-    return result.data;
-  } catch (error) {
-    console.error("Analytics Fetch Error:", error);
-    return null;
-  }
+interface Props {
+  data: InsightsData;
+  analyticsData?: AnalyticsData | null;
 }
 
 // ── Custom tooltip ──
@@ -115,10 +109,9 @@ function KpiCard({ label, value, icon, color, subtext }: {
   );
 }
 
-export default async function InsightsCharts({ data }: Props) {
+export default function InsightsCharts({ data, analyticsData }: Props) {
   const [dateRange, setDateRange] = useState<"3m" | "6m" | "12m">("12m");
-  const [activeTab, setActiveTab] = useState<"overview" | "members" | "payments" | "attendance" | "growth">("overview");
-
+  const [activeTab, setActiveTab] = useState<"overview" | "analytics" | "members" | "payments" | "attendance" | "growth">("overview");
   const { kpis, demographics, memberships, payments, attendance, growth } = data;
 
   // Filter monthly revenue by selected range
@@ -153,22 +146,17 @@ export default async function InsightsCharts({ data }: Props) {
     return Array.from(monthMap.values());
   }, [growth]);
 
-  await requireAdminOrStaff();
-  const analytics_data = await getAnalyticsData();
-
-  const {
-    totalRevenue,
-    totalMembers,
-    activeMembers,
-    overdue,
-    monthlyRevenue,
-    methodBreakdown,
-    planBreakdown,
-  } = analytics_data;
-
-  const months = Object.keys(monthlyRevenue || {});
-  // Safety fix: ensure we don't pass an empty array to Math.max
-  const monthlyValues = Object.values(monthlyRevenue || {}).map(Number);
+  // Derive analytics values from the optional analyticsData prop
+  const totalRevenue = analyticsData?.totalRevenue ?? 0;
+  const totalMembers = analyticsData?.totalMembers ?? 0;
+  const activeMembers_analytics = analyticsData?.activeMembers ?? 0;
+  const overdue = analyticsData?.overdue ?? 0;
+  const monthlyRevenue = analyticsData?.monthlyRevenue ?? {};
+  const methodBreakdown = analyticsData?.methodBreakdown ?? {};
+  const planBreakdown = analyticsData?.planBreakdown ?? [];
+ 
+  const months = Object.keys(monthlyRevenue);
+  const monthlyValues = Object.values(monthlyRevenue).map(Number);
   const maxRevenue = monthlyValues.length > 0 ? Math.max(...monthlyValues) : 1;
 
   const methodColors: Record<string, string> = {
@@ -176,15 +164,6 @@ export default async function InsightsCharts({ data }: Props) {
     CBE_BIRR: "#16A34A",
     CASH: "#6B7280",
   };
-
-  if (!data) {
-    return (
-      <div className="p-10 text-center">
-        <h2 className="text-lg font-semibold text-gray-700">Analytics Unavailable</h2>
-        <p className="text-sm text-gray-500">Please ensure the backend is running and you have admin permissions.</p>
-      </div>
-    );
-  }
 
   const tabs = [
     { key: "overview", label: "Overview", icon: "fa-grip" },
@@ -514,34 +493,14 @@ export default async function InsightsCharts({ data }: Props) {
       )}
 
       {/* ── ANALYTICS TAB ── */}
-      {activeTab === "analytics" && (
+      {activeTab === "analytics" && !analyticsData && (
+        <div className="p-10 text-center">
+          <h2 className="text-lg font-semibold text-gray-700">Analytics Unavailable</h2>
+          <p className="text-sm text-gray-500">Please ensure the backend is running and you have admin permissions.</p>
+        </div>
+      )}
+      {activeTab === "analytics" && analyticsData && (
         <div>
-          <div className="page-header">
-            <div>
-              <h1 className="page-title">Analytics</h1>
-              <p className="text-sm text-gray-500 mt-1">Financial and membership insights</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {[
-              { label: "Total Revenue (6mo)", value: formatETB(totalRevenue || 0), icon: "fa-coins", color: "bg-orange-100 text-[#F15A24]" },
-              { label: "Total Members", value: (totalMembers || 0).toString(), icon: "fa-users", color: "bg-blue-100 text-blue-600" },
-              { label: "Active Members", value: (activeMembers || 0).toString(), icon: "fa-user-check", color: "bg-green-100 text-green-600" },
-              { label: "Overdue Payments", value: (overdue || 0).toString(), icon: "fa-circle-exclamation", color: "bg-red-100 text-red-600" },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-white p-5 rounded-2xl border border-[#E5E5E5] flex items-center gap-4 shadow-sm">
-                <div className={`rounded-xl p-3 ${stat.color}`}>
-                  <i className={`fa-solid ${stat.icon} text-lg`} />
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-gray-900">{stat.value}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{stat.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-2xl border border-[#E5E5E5] lg:col-span-2 shadow-sm">
               <h2 className="text-base font-semibold text-gray-900 mb-6">Monthly Revenue (Last 6 Months)</h2>
