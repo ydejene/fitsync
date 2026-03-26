@@ -133,7 +133,7 @@ export default function PaymentSuccessPage() {
                 Your dashboard will unlock automatically once confirmed.
               </p>
               <button
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push("/insights")}
                 className="btn-primary w-full justify-center py-3 mt-4"
               >
                 <i className="fa-solid fa-gauge-high text-xs" /> Go to Dashboard
