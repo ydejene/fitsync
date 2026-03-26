@@ -51,8 +51,19 @@ interface InsightsData {
   };
 }
 
+interface AnalyticsData {
+  totalRevenue: number;
+  totalMembers: number;
+  activeMembers: number;
+  overdue: number;
+  monthlyRevenue: Record<string, number>;
+  methodBreakdown: Record<string, number>;
+  planBreakdown: { plan_id: string; count: number }[];
+}
+
 interface Props {
   data: InsightsData;
+  analyticsData?: AnalyticsData | null;
 }
 
 // ── Custom tooltip ──
@@ -98,10 +109,9 @@ function KpiCard({ label, value, icon, color, subtext }: {
   );
 }
 
-export default function InsightsCharts({ data }: Props) {
+export default function InsightsCharts({ data, analyticsData }: Props) {
   const [dateRange, setDateRange] = useState<"3m" | "6m" | "12m">("12m");
-  const [activeTab, setActiveTab] = useState<"overview" | "members" | "payments" | "attendance" | "growth">("overview");
-
+  const [activeTab, setActiveTab] = useState<"overview" | "analytics" | "members" | "payments" | "attendance" | "growth">("overview");
   const { kpis, demographics, memberships, payments, attendance, growth } = data;
 
   // Filter monthly revenue by selected range
@@ -136,8 +146,28 @@ export default function InsightsCharts({ data }: Props) {
     return Array.from(monthMap.values());
   }, [growth]);
 
+  // Derive analytics values from the optional analyticsData prop
+  const totalRevenue = analyticsData?.totalRevenue ?? 0;
+  const totalMembers = analyticsData?.totalMembers ?? 0;
+  const activeMembers_analytics = analyticsData?.activeMembers ?? 0;
+  const overdue = analyticsData?.overdue ?? 0;
+  const monthlyRevenue = analyticsData?.monthlyRevenue ?? {};
+  const methodBreakdown = analyticsData?.methodBreakdown ?? {};
+  const planBreakdown = analyticsData?.planBreakdown ?? [];
+ 
+  const months = Object.keys(monthlyRevenue);
+  const monthlyValues = Object.values(monthlyRevenue).map(Number);
+  const maxRevenue = monthlyValues.length > 0 ? Math.max(...monthlyValues) : 1;
+
+  const methodColors: Record<string, string> = {
+    TELEBIRR: "#F15A24",
+    CBE_BIRR: "#16A34A",
+    CASH: "#6B7280",
+  };
+
   const tabs = [
     { key: "overview", label: "Overview", icon: "fa-grip" },
+    { key: "analytics", label: "Analytics", icon: "fa-gauge-high" },
     { key: "members", label: "Members", icon: "fa-users" },
     { key: "payments", label: "Payments", icon: "fa-money-bill-wave" },
     { key: "attendance", label: "Attendance", icon: "fa-calendar-check" },
@@ -180,6 +210,29 @@ export default function InsightsCharts({ data }: Props) {
           color="bg-yellow-100 text-yellow-600"
         />
       </div>
+
+      <div className="card p-6 bg-white mb-6 rounded-2xl border border-[#E5E5E5]">
+          <h2 className="font-[family-name:var(--font-barlow)] text-lg font-semibold text-[#1A1A1A] mb-4">
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "Add Member", href: "/members/new", icon: "fa-user-plus" },
+              { label: "Record Payment", href: "/payments/new", icon: "fa-money-bill" },
+              { label: "New Membership", href: "/memberships/new", icon: "fa-id-card" },
+              { label: "Book Class", href: "/bookings/new", icon: "fa-calendar-plus" },
+            ].map((action) => (
+              <a
+                key={action.label}
+                href={action.href}
+                className="flex items-center gap-3 p-3 border border-[#E5E5E5] rounded-lg hover:border-[#F15A24] hover:bg-[#FFF0EB] transition-all group"
+              >
+                <i className={`fa-solid ${action.icon} text-[#9CA3AF] group-hover:text-[#F15A24] text-sm`} />
+                <span className="text-sm font-medium text-[#1A1A1A]">{action.label}</span>
+              </a>
+            ))}
+          </div>
+        </div>
 
       {/* ── Tabs + Date Filter ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
@@ -458,6 +511,95 @@ export default function InsightsCharts({ data }: Props) {
                 </div>
               )}
             </ChartCard>
+          </div>
+        </div>
+      )}
+
+      {/* ── ANALYTICS TAB ── */}
+      {activeTab === "analytics" && !analyticsData && (
+        <div className="p-10 text-center">
+          <h2 className="text-lg font-semibold text-gray-700">Analytics Unavailable</h2>
+          <p className="text-sm text-gray-500">Please ensure the backend is running and you have admin permissions.</p>
+        </div>
+      )}
+      {activeTab === "analytics" && analyticsData && (
+        <div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-[#E5E5E5] lg:col-span-2 shadow-sm">
+              <h2 className="text-base font-semibold text-gray-900 mb-6">Monthly Revenue (Last 6 Months)</h2>
+              {months.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+                  <i className="fa-solid fa-chart-bar text-3xl mb-2" />
+                  <p className="text-sm">No payment data yet</p>
+                </div>
+              ) : (
+                <div className="flex items-end gap-4 h-48">
+                  {months.map((month) => {
+                    const val = Number(monthlyRevenue[month] || 0);
+                    const heightPct = (val / maxRevenue) * 100;
+                    return (
+                      <div key={month} className="flex flex-col items-center gap-2 flex-1">
+                        <p className="text-[10px] font-semibold text-gray-700">{formatETB(val)}</p>
+                        <div className="w-full bg-gray-100 rounded-t-lg relative overflow-hidden h-32">
+                          <div
+                            className="absolute bottom-0 w-full bg-[#F15A24] rounded-t-lg transition-all"
+                            style={{ height: `${heightPct}%` }}
+                          />
+                        </div>
+                        <p className="text-[10px] text-gray-500">{month}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-[#E5E5E5] shadow-sm">
+              <h2 className="text-base font-semibold text-gray-900 mb-6">Payment Methods</h2>
+              {Object.keys(methodBreakdown || {}).length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+                  <i className="fa-solid fa-credit-card text-3xl mb-2" />
+                  <p className="text-sm">No data yet</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {Object.entries(methodBreakdown || {}).map(([method, amount]: [string, any]) => {
+                    const pct = totalRevenue > 0 ? (Number(amount) / totalRevenue) * 100 : 0;
+                    return (
+                      <div key={method}>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="font-medium text-gray-700">{method}</span>
+                          <span className="text-gray-500">{pct.toFixed(1)}%</span>
+                        </div>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${pct}%`,
+                              backgroundColor: methodColors[method] ?? "#6B7280",
+                            }}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">{formatETB(Number(amount))}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-[#E5E5E5] lg:col-span-3 shadow-sm">
+              <h2 className="text-base font-semibold text-gray-900 mb-6">Membership Plan Distribution</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {planBreakdown?.map((pb: any) => (
+                  <div key={pb.plan_id} className="rounded-xl border border-gray-100 p-4 text-center">
+                    <p className="text-3xl font-bold text-[#F15A24]">{pb.count}</p>
+                    <p className="text-sm text-gray-600 mt-1">Plan ID: {pb.plan_id}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">members</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
