@@ -312,7 +312,7 @@ export default function LandingPage() {
                       }`}
                     >
                       <i className="fa-solid fa-mobile-screen text-xs" />
-                      Pay with Telebirr
+                     Get Started
                     </CTAButton>
                   </div>
               </StaggerItem>
