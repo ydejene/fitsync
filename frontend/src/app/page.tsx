@@ -1,4 +1,5 @@
 import Link from "next/link";
+import GoogleTranslate from "@/components/GoogleTranslate";
 import {
   FadeIn,
   StaggerContainer,
@@ -29,6 +30,7 @@ export default function LandingPage() {
             <a href="#contact" className="text-sm text-text-secondary hover:text-brand-orange transition-colors">Contact</a>
           </div>
           <div className="flex items-center gap-3">
+            <GoogleTranslate />
             <Link href="/login" className="text-sm font-medium text-text-primary hover:text-brand-orange transition-colors">
               Sign in
             </Link>
