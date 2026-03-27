@@ -22,7 +22,7 @@ This README focuses on what is currently present in the codebase and how to run 
 
 ## Project Overview
 
-FitSync is intended to help gyms manage:
+FitSync is intended to help gym owners and their operational teams manage:
 
 - member records
 - membership plans and active subscriptions
@@ -40,9 +40,10 @@ The codebase is currently organized as a split frontend/backend application:
 
 | User Type | Current Relevance in Repo |
 | --- | --- |
-| Admin | Full backend and dashboard access in the current role model |
-| Staff | Operational dashboard access for day-to-day management flows |
-| Member | Exists in the domain model and role checks, but member self-service flows are not documented as complete here |
+| Owner | Primary product user in the current repo. Owners sign up, subscribe, and access the operational dashboard once the subscription is active. |
+| Staff | Operational dashboard user with permission-based access to members, classes, payments, plans, and insights. |
+| Admin | System-level management user used for broader platform oversight, audit access, and staff administration. |
+| Member | Exists in the domain model and role checks, but member self-service flows are not documented as complete here. |
 
 ## Current Repository Status
 
@@ -56,11 +57,11 @@ This section is deliberately scoped to what is present in the repository today.
 
 ### Dashboard Areas Present in the Codebase
 
-- dashboard overview
+- dashboard overview for owner/admin/staff users
 - members
 - memberships
 - bookings
-- staff
+- staff management for admin users
 - analytics
 - audit log
 
@@ -296,15 +297,16 @@ The Express app currently exposes the following route groups:
 
 The current backend role model uses:
 
-- `ADMIN` (System Administrators)
-- `OWNER` (Gym Owners with active subscriptions)
-- `STAFF` (Gym Staff members)
-- `MEMBER` (Gym Clients/Members)
+- `OWNER` (Primary business user. Signs up, subscribes, and operates the gym dashboard after activation.)
+- `STAFF` (Operational team members with permission-based access.)
+- `ADMIN` (System/platform management user with broader oversight.)
+- `MEMBER` (Gym clients/members tracked by the system.)
 
 Current middleware behavior in the repo:
 
 - authentication is required for protected routes
-- admin or staff access is required for most dashboard management routes
+- owner, admin, or staff access is allowed for most operational dashboard routes
+- active owner subscriptions are enforced before owner dashboard access
 - admin-only access is enforced for audit and staff management routes
 
 ## Current Notes and Gaps

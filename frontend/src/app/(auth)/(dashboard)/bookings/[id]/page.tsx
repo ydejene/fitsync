@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { clientFetch } from "@/lib/api";
 
@@ -34,7 +34,6 @@ type Tab = "attendees" | "edit";
 
 export default function ManageClassPage() {
   const params = useParams();
-  const router = useRouter();
   const classId = params.id as string;
 
   const [cls, setCls] = useState<ClassData | null>(null);
