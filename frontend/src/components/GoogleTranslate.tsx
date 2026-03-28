@@ -2,10 +2,22 @@
 
 import { useEffect, useState, useRef } from "react";
 
+interface TranslateElementOptions {
+  pageLanguage: string;
+  includedLanguages: string;
+  autoDisplay: boolean;
+}
+
+interface TranslateWindow {
+  translate: {
+    TranslateElement: new (options: TranslateElementOptions, elementId: string) => unknown;
+  };
+}
+
 declare global {
   interface Window {
     googleTranslateElementInit?: () => void;
-    google?: any;
+    google?: TranslateWindow;
   }
 }
 
@@ -15,7 +27,16 @@ const languages = [
 ];
 
 export default function GoogleTranslate() {
-  const [currentLang, setCurrentLang] = useState("en");
+  const [currentLang, setCurrentLang] = useState(() => {
+    if (typeof document === "undefined") return "en";
+
+    const cookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("googtrans="));
+
+    const lang = cookie?.split("/").pop();
+    return lang && lang !== "en" ? lang : "en";
+  });
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -41,14 +62,6 @@ export default function GoogleTranslate() {
     script.async = true;
     document.body.appendChild(script);
 
-    // Check if a language was previously selected
-    const cookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("googtrans="));
-    if (cookie) {
-      const lang = cookie.split("/").pop();
-      if (lang && lang !== "en") setCurrentLang(lang);
-    }
   }, []);
 
     // Close dropdown when clicking outside
@@ -84,6 +97,10 @@ export default function GoogleTranslate() {
       {/* Custom dropdown button */}
       <button
         onClick={() => setOpen(!open)}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`Switch language. Current language: ${current.label}`}
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E5E5E5] bg-white hover:border-[#F15A24] text-sm font-medium transition-all cursor-pointer"
       >
         <span className="text-[#1A1A1A]">{current.label}</span>
@@ -92,11 +109,13 @@ export default function GoogleTranslate() {
 
       {/* Dropdown menu */}
       {open && (
-        <div className="absolute right-0 mt-2 w-40 bg-white border border-[#E5E5E5] rounded-xl shadow-lg overflow-hidden z-50">
+        <div role="listbox" className="absolute right-0 mt-2 w-40 bg-white border border-[#E5E5E5] rounded-xl shadow-lg overflow-hidden z-50">
           {languages.map((lang) => (
             <button
               key={lang.code}
+              type="button"
               onClick={() => switchLanguage(lang.code)}
+              aria-label={`Switch language to ${lang.label}`}
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                 currentLang === lang.code
                   ? "bg-[#FFF0EB] text-[#F15A24] font-semibold"

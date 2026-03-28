@@ -1,9 +1,13 @@
 import { requireAdminOrStaff } from "@/lib/auth";
 import { apiFetch } from "@/lib/api.server";
 import InsightsCharts from "./InsightsCharts";
+import AnalyticsCharts from "./InsightsCharts";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Insights | FitSync" };
+import { formatETB } from "@/utils";
+
+export const analyticsMetadata: Metadata = { title: "Analytics" };
+export const metadata: Metadata = { title: "Insights" };
 
 async function getInsightsData() {
   try {
@@ -16,9 +20,23 @@ async function getInsightsData() {
   }
 }
 
+async function getAnalyticsData() {
+  try {
+    const result = await apiFetch("/api/analytics");
+    if (!result.success) throw new Error(result.message || "Failed to fetch analytics");
+    return result.data;
+  } catch (error) {
+    console.error("Analytics Fetch Error:", error);
+    return null;
+  }
+}
+
 export default async function InsightsPage() {
   await requireAdminOrStaff();
-  const data = await getInsightsData();
+  const [data, analyticsData] = await Promise.all([
+    getInsightsData(),
+    getAnalyticsData(),
+  ]);
 
   if (!data) {
     return (
@@ -45,7 +63,7 @@ export default async function InsightsPage() {
         </div>
       </div>
 
-      <InsightsCharts data={data} />
+      <InsightsCharts data={data} analyticsData={analyticsData} />
     </div>
   );
 }

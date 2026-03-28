@@ -2,6 +2,10 @@ const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
+const {
+  isValidEmail,
+  normalizeRequiredString,
+} = require("../utils/validation");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -68,18 +72,25 @@ const USER_FIELDS = `
  */
 async function register(req, res) {
   try {
-    const { fullName, email, password, phone } = req.body;
+    const fullName = normalizeRequiredString(req.body.fullName);
+    const email = normalizeRequiredString(req.body.email);
+    const password = normalizeRequiredString(req.body.password);
+    const phone = normalizeRequiredString(req.body.phone);
 
-    if (!fullName || !email || !password || !phone) {
-      return res.status(400).json({
-        success: false,
-        message: "Full name, email, password, and phone are required",
-      });
+    if (!fullName) {
+      return res.status(400).json({ success: false, message: "Full name is required." });
+    }
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email address is required." });
+    }
+    if (!password) {
+      return res.status(400).json({ success: false, message: "Password is required." });
+    }
+    if (!phone) {
+      return res.status(400).json({ success: false, message: "Phone number is required." });
     }
 
-    // Email Regex Validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!isValidEmail(email)) {
       return res.status(400).json({ success: false, message: "Invalid email format" });
     }
 
@@ -137,13 +148,17 @@ async function register(req, res) {
  */
 async function login(req, res) {
   try {
-    const { email, password } = req.body;
-    if (!email || !password)
-      return res.status(400).json({ success: false, message: "Email and password required" });
+    const email = normalizeRequiredString(req.body.email);
+    const password = normalizeRequiredString(req.body.password);
 
-    // Email Regex Validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email address is required." });
+    }
+    if (!password) {
+      return res.status(400).json({ success: false, message: "Password is required." });
+    }
+
+    if (!isValidEmail(email)) {
       return res.status(400).json({ success: false, message: "Invalid email format" });
     }
 

@@ -4,12 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GoogleLogin } from "@react-oauth/google";
+import { getRequiredFieldMessage, isValidEmail } from "@/utils/validation";
+
+interface GoogleCredentialResponse {
+  credential?: string;
+}
 
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
 
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
@@ -17,20 +23,20 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    // Empty field checks
+    const nextFieldErrors: { email?: string; password?: string } = {};
+
     if (!form.email.trim()) {
-      setError("Email address is required.");
-      return;
+      nextFieldErrors.email = getRequiredFieldMessage("Email address");
+    } else if (!isValidEmail(form.email)) {
+      nextFieldErrors.email = "Please enter a valid email address.";
     }
     if (!form.password.trim()) {
-      setError("Password is required.");
-      return;
+      nextFieldErrors.password = getRequiredFieldMessage("Password");
     }
-    
-    // Email Regex Validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) {
-      setError("Please enter a valid email address.");
+
+    setFieldErrors(nextFieldErrors);
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setError(Object.values(nextFieldErrors)[0] || "Please review the highlighted fields.");
       return;
     }
 
@@ -53,7 +59,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/insights");
     } catch (err) {
       setError("Cannot connect to server. Is the backend running?");
       console.error("Login Error:", err);
@@ -61,7 +67,7 @@ export default function LoginPage() {
     }
   }
 
-  async function handleGoogleSuccess(credentialResponse: any) {
+  async function handleGoogleSuccess(credentialResponse: GoogleCredentialResponse) {
     setLoading(true);
     setError("");
     try {
@@ -79,7 +85,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/insights");
     } catch (err) {
       setError("Failed to login with Google");
       console.error(err);
@@ -104,35 +110,67 @@ export default function LoginPage() {
 
         {/* Card Component */}
         <div className="card p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wide text-text-secondary mb-1.5">
+              <label htmlFor="login-email" className="block text-xs font-semibold uppercase tracking-wide text-text-secondary mb-1.5">
                 Email address
               </label>
               <input
+                id="login-email"
                 type="email"
                 className="input"
                 placeholder="you@example.com"
                 value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                onChange={(e) => {
+                  setForm({ ...form, email: e.target.value });
+                  setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                  if (error) setError("");
+                }}
+                required
+                autoComplete="email"
+                aria-invalid={Boolean(fieldErrors.email)}
+                aria-describedby={fieldErrors.email ? "login-email-error" : undefined}
               />
+              {fieldErrors.email && (
+                <p id="login-email-error" className="mt-1 text-xs text-red-600">
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wide text-text-secondary mb-1.5">
+              <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-wide text-text-secondary mb-1.5">
                 Password
               </label>
               <input
+                id="login-password"
                 type="password"
                 className="input"
                 placeholder="Enter your password"
                 value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                onChange={(e) => {
+                  setForm({ ...form, password: e.target.value });
+                  setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                  if (error) setError("");
+                }}
+                required
+                autoComplete="current-password"
+                aria-invalid={Boolean(fieldErrors.password)}
+                aria-describedby={fieldErrors.password ? "login-password-error" : undefined}
               />
+              {fieldErrors.password && (
+                <p id="login-password-error" className="mt-1 text-xs text-red-600">
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg">
-                <i className="fa-solid fa-circle-exclamation text-red-500 text-sm" />
+              <div
+                role="alert"
+                aria-live="polite"
+                className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg"
+              >
+                <i className="fa-solid fa-circle-exclamation text-red-500 text-sm" aria-hidden="true" />
                 <span className="text-sm text-red-600">{error}</span>
               </div>
             )}
