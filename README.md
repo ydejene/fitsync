@@ -227,8 +227,8 @@ NEXT_PUBLIC_BACKEND_URL="http://localhost:5000"
 ```bash
 git clone <your-remote-url>
 cd fitsync
-git checkout develop
-git pull --ff-only origin develop
+git checkout main
+git pull --ff-only origin main
 git switch -c your-feature-branch
 ```
 
@@ -484,7 +484,7 @@ For production, the project deploys from the `main` branch:
 | Frontend | **Vercel** | Next.js optimized hosting. Set `JWT_SECRET` and `NEXT_PUBLIC_BACKEND_URL` (pointing to the Render URL) in Vercel project settings. |
 | Database | **PostgreSQL** | Hosted PostgreSQL instance (e.g., Render managed database). Use the external connection string as `DATABASE_URL`. |
 
-The workflow is: feature branches → PR into `develop` → tested on `develop` → merged into `main` for production deployment.
+The workflow is: feature branches → PR into `main` → tested and merged for production deployment.
 
 ## Current Notes and Gaps
 
@@ -505,12 +505,12 @@ The Ethio Telecom Telebirr Sandbox is used in development. Note:
 
 ## Contribution Workflow
 
-1. Branch from `develop`
+1. Branch from `main`
 2. Push changes to your own feature branch
-3. Open a PR into `develop`
+3. Open a PR into `main`
 4. Request review from Abdul or Yonas
 5. Do not merge your own PR
-6. Once `develop` is stable and tested, it will be merged into `main` for production deployment
+6. Once your PR is stable and approved, it will be merged into `main` for production deployment
 
 ## Acknowledgments
 
