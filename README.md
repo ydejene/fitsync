@@ -5,13 +5,13 @@
 [![Live App](https://img.shields.io/badge/Live%20App-Vercel-black?logo=vercel)](https://fitsync-app.vercel.app)
 [![API]
 (https://img.shields.io/badge/API-Render-46E3B7?logo=render)](https://fitsync-api.onrender.com)
-[![Jira Board](https://img.shields.io/badge/Jira-Project%20Board-0052CC?logo=jira)](https://your-team.atlassian.net/jira/software/projects/FITS/boards)
+[![Jira Board](https://alustudent-team-k1plq8kl.atlassian.net/jira/software/projects/FIT/boards/100)]
 
 ---
 
 ## Demo
 
-> 📹 **[Watch Demo Video](https://your-demo-video-link-here)** ← replace with actual link before submission
+> 📹 **[Watch Demo Video](https://youtu.be/t3iL6IqruNU)** ← replace with actual link before submission
 
 ---
 
