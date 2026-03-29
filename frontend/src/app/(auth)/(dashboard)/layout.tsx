@@ -15,6 +15,7 @@ export default async function DashboardLayout({
   if (!session) redirect("/login");
 
   // For OWNER users: check if subscription is active
+  // ADMINs skip this check — they can browse the gym dashboard freely
   if (session.role === "OWNER") {
     const userData = await apiFetch("/api/auth/me");
     const user = userData?.data?.user;

@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
 
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
@@ -98,11 +99,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-brand-orange rounded-xl flex items-center justify-center">
-              <i className="fa-solid fa-dumbbell text-white" />
-            </div>
-            <span className="font-display text-2xl font-bold text-text-primary">FitSync</span>
+          <Link href="/" className="inline-flex items-center mb-6 hover:opacity-85 transition-opacity">
+            <img src="/logo.png" alt="FitSync Logo" className="h-10 md:h-12 w-auto object-contain" />
           </Link>
           <h1 className="font-display text-3xl font-bold text-text-primary">Welcome back</h1>
           <p className="text-sm text-text-secondary mt-1">Sign in to your account</p>
@@ -141,22 +139,37 @@ export default function LoginPage() {
               <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-wide text-text-secondary mb-1.5">
                 Password
               </label>
-              <input
-                id="login-password"
-                type="password"
-                className="input"
-                placeholder="Enter your password"
-                value={form.password}
-                onChange={(e) => {
-                  setForm({ ...form, password: e.target.value });
-                  setFieldErrors((prev) => ({ ...prev, password: undefined }));
-                  if (error) setError("");
-                }}
-                required
-                autoComplete="current-password"
-                aria-invalid={Boolean(fieldErrors.password)}
-                aria-describedby={fieldErrors.password ? "login-password-error" : undefined}
-              />
+              <div className="relative group">
+                <input
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  className="input pr-10"
+                  placeholder="Enter your password"
+                  value={form.password}
+                  onChange={(e) => {
+                    setForm({ ...form, password: e.target.value });
+                    setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                    if (error) setError("");
+                  }}
+                  required
+                  autoComplete="current-password"
+                  aria-invalid={Boolean(fieldErrors.password)}
+                  aria-describedby={fieldErrors.password ? "login-password-error" : undefined}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-brand-orange transition-colors duration-200 cursor-pointer p-1"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <i className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} text-sm`} />
+                </button>
+              </div>
+              <div className="flex justify-end mt-1.5">
+                <Link href="/forgot-password" title="Get a password reset link" className="text-xs font-medium text-brand-orange hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
               {fieldErrors.password && (
                 <p id="login-password-error" className="mt-1 text-xs text-red-600">
                   {fieldErrors.password}
@@ -213,6 +226,9 @@ export default function LoginPage() {
           <Link href="/register" className="text-brand-orange font-semibold hover:underline">
             Create Account
           </Link>
+        </p>
+        <p className="text-center text-xs text-text-muted mt-8">
+          Need help? <a href="https://t.me/Niyoll" target="_blank" rel="noopener noreferrer" className="text-brand-orange hover:underline font-medium">Contact Support</a>
         </p>
         <p className="text-center text-xs text-text-muted mt-2">
           FitSync — Gym Management Platform for Addis Ababa

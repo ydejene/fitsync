@@ -26,6 +26,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     fullName?: string;
     email?: string;
@@ -173,11 +174,8 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-brand-orange rounded-xl flex items-center justify-center">
-              <i className="fa-solid fa-dumbbell text-white" />
-            </div>
-            <span className="font-display text-2xl font-bold text-text-primary">FitSync</span>
+          <Link href="/" className="inline-flex items-center mb-6 hover:opacity-85 transition-opacity">
+            <img src="/logo.png" alt="FitSync Logo" className="h-10 md:h-12 w-auto object-contain" />
           </Link>
           <h1 className="font-display text-3xl font-bold text-text-primary">Get Started</h1>
           <p className="text-sm text-text-secondary mt-1">
@@ -275,23 +273,33 @@ export default function RegisterPage() {
               <label htmlFor="register-password" className="block text-xs font-semibold uppercase tracking-wide text-text-secondary mb-1.5">
                 Password
               </label>
-              <input
-                id="register-password"
-                type="password"
-                className="input"
-                placeholder="At least 8 characters"
-                value={form.password}
-                onChange={(e) => {
-                  setForm({ ...form, password: e.target.value });
-                  setFieldErrors((prev) => ({ ...prev, password: undefined }));
-                  if (error) setError("");
-                }}
-                required
-                minLength={8}
-                autoComplete="new-password"
-                aria-invalid={Boolean(fieldErrors.password)}
-                aria-describedby={fieldErrors.password ? "register-password-error" : undefined}
-              />
+              <div className="relative group">
+                <input
+                  id="register-password"
+                  type={showPassword ? "text" : "password"}
+                  className="input pr-10"
+                  placeholder="At least 8 characters"
+                  value={form.password}
+                  onChange={(e) => {
+                    setForm({ ...form, password: e.target.value });
+                    setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                    if (error) setError("");
+                  }}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  aria-invalid={Boolean(fieldErrors.password)}
+                  aria-describedby={fieldErrors.password ? "register-password-error" : undefined}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-brand-orange transition-colors duration-200 cursor-pointer p-1"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <i className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} text-sm`} />
+                </button>
+              </div>
               {fieldErrors.password && (
                 <p id="register-password-error" className="mt-1 text-xs text-red-600">
                   {fieldErrors.password}
@@ -350,7 +358,10 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-text-muted mt-6">
+        <p className="text-center text-xs text-text-muted mt-8">
+          Need help? <a href="https://t.me/Niyoll" target="_blank" rel="noopener noreferrer" className="text-brand-orange font-medium hover:underline">Contact Support</a>
+        </p>
+        <p className="text-center text-xs text-text-muted mt-6 mb-8">
           FitSync — Gym Management Platform for Addis Ababa
         </p>
       </div>

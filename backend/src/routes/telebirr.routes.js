@@ -16,12 +16,16 @@ const {
   initiatePayment,
   handleWebhook,
   checkPaymentStatus,
+  handleMockPayment,
 } = require("../controllers/telebirr.controller");
 
 const router = Router();
 
 // Authenticated: gym owner initiates a payment
 router.post("/initiate", authenticate, initiatePayment);
+
+// Authenticated: frontend sends mock payment success for Demo Mode
+router.post("/mock-payment", authenticate, handleMockPayment);
 
 // Public: telebirr server sends payment notification (no auth middleware)
 router.post("/webhook", handleWebhook);

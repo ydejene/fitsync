@@ -42,6 +42,12 @@ export async function requireAdmin(): Promise<AuthUser> {
   return session;
 }
 
+export async function requireOwner(): Promise<AuthUser> {
+  const session = await requireAuth();
+  if (session.role !== "OWNER" && session.role !== "ADMIN") throw new Error("FORBIDDEN");
+  return session;
+}
+
 export async function requireAdminOrStaff(): Promise<AuthUser> {
   const session = await requireAuth();
   if (session.role === "MEMBER") throw new Error("FORBIDDEN");

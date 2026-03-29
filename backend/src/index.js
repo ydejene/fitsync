@@ -1,4 +1,4 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Bypass strict SSL for Telebirr sandbox
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // required for Telebirr sandbox SSL
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -14,50 +14,45 @@ const dashboardRoutes      = require("./routes/dashboard.routes");
 const staffRoutes          = require("./routes/staff.routes");
 const analyticsRoutes      = require("./routes/analytics.routes");
 const auditRoutes          = require("./routes/audit.routes");
-const insightsRoutes   = require("./routes/insights.routes");
-const userRoutes       = require("./routes/user.routes");
+const insightsRoutes       = require("./routes/insights.routes");
+const userRoutes           = require("./routes/user.routes");
 const telebirrRoutes       = require("./routes/telebirr.routes");
 const subscriptionRoutes   = require("./routes/subscription.routes");
+const adminRoutes          = require("./routes/admin.routes");
 const { authenticate } = require("./middleware/auth.middleware");
 const { requireActiveSubscription } = require("./middleware/subscription.middleware");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ── Middleware ──
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || "http://localhost:3000",
-    "http://192.168.1.2:3000"
-  ],
+  origin: [process.env.FRONTEND_URL || "http://localhost:3000", "http://192.168.1.2:3000"],
   credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
 
-// ── Security Headers for Google Auth ──
+// Required for Google OAuth popup flow
 app.use((_req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   next();
 });
 
-// ── Static Files ──
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// ── Public Routes (no authentication required) ──
+// Public routes
 app.use("/api/auth",               authRoutes);
 app.use("/api/telebirr",           telebirrRoutes);
 app.use("/api/subscription-plans", subscriptionRoutes);
 
-// ── Protected Routes (AUTHENTICATION REQUIRED) ──
-app.use(authenticate); // Following routes require a valid token
+// All routes below require a valid JWT
+app.use(authenticate);
 
-// 1. Account info (no subscription needed to see profile/pay)
-app.use("/api/users", userRoutes);
+app.use("/api/users", userRoutes);   // profile — no subscription check
+app.use("/api/admin", adminRoutes);  // platform admin — requireAdmin enforced inside router
 
-// 2. Gym Management features (SUBSCRIPTION REQUIRED for Owners)
+// Gym management routes — require active subscription
 const sub_check = requireActiveSubscription;
-
 app.use("/api/dashboard",   sub_check, dashboardRoutes);
 app.use("/api/members",     sub_check, memberRoutes);
 app.use("/api/payments",    sub_check, paymentRoutes);
@@ -66,15 +61,12 @@ app.use("/api/bookings",    sub_check, bookingRoutes);
 app.use("/api/staff",       sub_check, staffRoutes);
 app.use("/api/analytics",   sub_check, analyticsRoutes);
 app.use("/api/audit",       sub_check, auditRoutes);
-app.use("/api/insights",    insightsRoutes); // Analytics insights
+app.use("/api/insights",    insightsRoutes);
 
-
-// ── Health check ──
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, message: "FitSync API is running", port: PORT });
 });
 
-// ── Global error handler ──
 app.use((err, _req, res, _next) => {
   console.error(err.stack);
   res.status(500).json({ success: false, message: "Internal server error" });
