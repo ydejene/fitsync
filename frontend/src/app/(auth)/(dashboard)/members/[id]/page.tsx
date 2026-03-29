@@ -3,6 +3,7 @@ import { apiFetch } from "@/lib/api.server";
 import { formatDate } from "@/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import RenewMembershipDialog from "./RenewMembershipDialog";
 
 interface MemberMembership {
   id: string;
@@ -37,9 +38,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
           <Link href={`/members/${id}/edit`} className="px-4 py-2 border border-[#E5E5E5] rounded-lg text-sm font-medium bg-white hover:bg-gray-50">
             Edit Profile
           </Link>
-          <button className="px-4 py-2 bg-[#F15A24] text-white rounded-lg text-sm font-medium hover:bg-[#D94E1F]">
-            Renew Membership
-          </button>
+          <RenewMembershipDialog memberId={member.id ?? id} memberName={member.full_name ?? "Member"} />
         </div>
       </div>
 
@@ -67,12 +66,28 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
                 <span className="font-medium">{member.phone || "—"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6B6B6B]">Address</span>
-                <span className="font-medium">{member.address || "—"}</span>
+                <span className="text-[#6B6B6B]">WhatsApp</span>
+                <span className="font-medium">{member.whatsapp_number || "—"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#6B6B6B]">Gender</span>
                 <span className="font-medium">{member.gender || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#6B6B6B]">Date of Birth</span>
+                <span className="font-medium">
+                  {member.dob
+                    ? `${formatDate(member.dob)} (${Math.floor((Date.now() - new Date(member.dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} yrs)`
+                    : "—"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#6B6B6B]">Address</span>
+                <span className="font-medium text-right max-w-[60%]">{member.address || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#6B6B6B]">Emergency</span>
+                <span className="font-medium text-right max-w-[60%]">{member.emergency_contact || "—"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#6B6B6B]">Joined</span>
