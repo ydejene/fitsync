@@ -43,10 +43,13 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-text-primary text-white">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(241,90,36,0.3) 40px, rgba(241,90,36,0.3) 41px), repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(241,90,36,0.3) 40px, rgba(241,90,36,0.3) 41px)"
-          }} />
+        <div className="absolute inset-0">
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+            style={{ backgroundImage: "url('/gym.png')" }} 
+          />
+          {/* Dark overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-black/70" />
         </div>
         <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
