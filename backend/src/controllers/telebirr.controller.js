@@ -1,33 +1,11 @@
-/**
- * @fileoverview Telebirr Payment Controller
- * Handles payment initiation, webhook processing, and status checking
- * for the B2B subscription payment flow.
- *
- * Endpoints:
- *  POST /api/telebirr/initiate   – Start a telebirr payment (authenticated)
- *  POST /api/telebirr/webhook    – Receive payment notification (no auth)
- *  GET  /api/telebirr/status/:id – Check payment status (authenticated)
- *
- * @module controllers/telebirr
- */
-
 const pool = require("../config/db");
 const telebirrService = require("../services/telebirr.service");
 
-/**
- * POST /api/telebirr/initiate
- * Initiates a telebirr B2B payment for a subscription plan.
- *
- * Request body: { planId: UUID }
- * Response: { success: true, data: { checkoutUrl, merchOrderId } }
- *
- * Flow:
- * 1. Validate plan exists and is active
- * 2. Generate unique merchant order ID
- * 3. Create pending telebirr_transaction record
- * 4. Call telebirr API to create order and get checkout URL
- * 5. Return checkout URL for frontend redirect
- */
+// Set TELEBIRR_DEMO_MODE=true in .env to use the mock payment flow instead of live sandbox
+const IS_DEMO_MODE = process.env.TELEBIRR_DEMO_MODE === "true";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+
+// POST /api/telebirr/initiate
 async function initiatePayment(req, res) {
   const client = await pool.connect();
   try {
@@ -65,7 +43,6 @@ async function initiatePayment(req, res) {
 
     await client.query("BEGIN");
 
-    // Create pending telebirr transaction record
     await client.query(
       `INSERT INTO telebirr_transactions
         (user_id, subscription_plan_id, merch_order_id, total_amount, status)
@@ -73,16 +50,30 @@ async function initiatePayment(req, res) {
       [userId, planId, merchOrderId, plan.price_etb]
     );
 
-    // Call Telebirr API: get token → create order → generate checkout URL
+    if (IS_DEMO_MODE) {
+      const mockCheckoutUrl = `${FRONTEND_URL}/payment/mock?merchOrderId=${merchOrderId}&amount=${plan.price_etb}&planName=${encodeURIComponent(plan.name)}`;
+      
+      await client.query(
+        `UPDATE telebirr_transactions
+         SET response_payload = $1, updated_at = NOW()
+         WHERE merch_order_id = $2`,
+        [JSON.stringify({ mode: "DEMO_MOCK_INITIATED" }), merchOrderId]
+      );
+
+      await client.query("COMMIT");
+
+      return res.json({
+        success: true,
+        message: "Payment initiated (Demo Mode)",
+        data: { checkoutUrl: mockCheckoutUrl, merchOrderId },
+      });
+    }
+
     let orderResult;
     try {
-      orderResult = await telebirrService.createOrder({
-        title,
-        amount,
-        merchOrderId,
-      });
+      orderResult = await telebirrService.createOrder({ title, amount, merchOrderId });
     } catch (apiErr) {
-      // Catch specific Ethio Telecom Sandbox outage (Southbound service unavailable)
+      // Error code 49401024991 = Ethio Telecom sandbox is down
       if (apiErr.message?.includes("49401024991")) {
         await client.query("ROLLBACK");
         return res.status(503).json({
@@ -91,10 +82,9 @@ async function initiatePayment(req, res) {
           code: "TELEBIRR_SANDBOX_DOWN"
         });
       }
-      throw apiErr; // Let the main catch block handle other errors
+      throw apiErr;
     }
 
-    // Update transaction with prepay_id and API response
     await client.query(
       `UPDATE telebirr_transactions
        SET prepay_id = $1, response_payload = $2, updated_at = NOW()
@@ -106,7 +96,6 @@ async function initiatePayment(req, res) {
 
     await client.query("COMMIT");
 
-    // Audit log: payment initiated
     await pool.query(
       `INSERT INTO audit_logs (actor_id, actor_email, action, entity_type, entity_id, new_value)
        VALUES ($1, $2, 'TELEBIRR_PAYMENT_INITIATED', 'telebirr_transaction', NULL,
@@ -131,21 +120,7 @@ async function initiatePayment(req, res) {
   }
 }
 
-/**
- * POST /api/telebirr/webhook
- * Receives payment confirmation from the Telebirr server.
- * This endpoint has NO authentication — it's called server-to-server by Telebirr.
- *
- * Expected body fields (per Telebirr docs):
- *  - merch_order_id, payment_order_id, total_amount, trade_status,
- *    trans_currency, sign, sign_type, etc.
- *
- * On success:
- * 1. Updates telebirr_transaction status to 'success'
- * 2. Creates a payment record in the payments table
- * 3. Activates the user's subscription (subscription_status → 'active')
- * 4. Creates an audit log entry
- */
+// POST /api/telebirr/webhook — server-to-server, no auth
 async function handleWebhook(req, res) {
   const client = await pool.connect();
   try {
@@ -156,7 +131,6 @@ async function handleWebhook(req, res) {
       return res.status(400).json({ success: false, message: "Missing merch_order_id" });
     }
 
-    // Find the corresponding transaction
     const txResult = await client.query(
       "SELECT * FROM telebirr_transactions WHERE merch_order_id = $1",
       [merch_order_id]
@@ -168,14 +142,12 @@ async function handleWebhook(req, res) {
       return res.status(404).json({ success: false, message: "Transaction not found" });
     }
 
-    // Skip if already processed (idempotency)
-    if (transaction.status === "success") {
+    if (transaction.status === "success") { // idempotency guard
       return res.json({ success: true, message: "Already processed" });
     }
 
     await client.query("BEGIN");
 
-    // Store raw webhook payload for audit trail
     await client.query(
       `UPDATE telebirr_transactions
        SET webhook_payload = $1, payment_order_id = $2, updated_at = NOW()
@@ -184,16 +156,12 @@ async function handleWebhook(req, res) {
     );
 
     if (trade_status === "Completed") {
-      // ── Payment Successful ──
-
-      // Update telebirr transaction status
       await client.query(
         `UPDATE telebirr_transactions SET status = 'success', updated_at = NOW()
          WHERE merch_order_id = $1`,
         [merch_order_id]
       );
 
-      // Create a payment record in the main payments table
       const paymentResult = await client.query(
         `INSERT INTO payments (user_id, amount_etb, payment_method, transaction_ref, status, notes)
          VALUES ($1, $2, 'TELEBIRR', $3, 'COMPLETED', $4)
@@ -206,20 +174,17 @@ async function handleWebhook(req, res) {
         ]
       );
 
-      // Link payment to telebirr transaction
       await client.query(
         "UPDATE telebirr_transactions SET payment_id = $1 WHERE merch_order_id = $2",
         [paymentResult.rows[0].id, merch_order_id]
       );
 
-      // Fetch the subscription plan for duration calculation
       const planResult = await client.query(
         "SELECT * FROM subscription_plans WHERE id = $1",
         [transaction.subscription_plan_id]
       );
       const plan = planResult.rows[0];
 
-      // Activate user's subscription
       const startDate = new Date();
       const endDate = new Date();
       endDate.setDate(endDate.getDate() + (plan ? plan.duration_days : 30));
@@ -235,7 +200,6 @@ async function handleWebhook(req, res) {
         [transaction.subscription_plan_id, startDate, endDate, transaction.user_id]
       );
 
-      // Audit log: subscription activated
       await client.query(
         `INSERT INTO audit_logs (actor_id, action, entity_type, new_value)
          VALUES ($1, 'SUBSCRIPTION_ACTIVATED', 'user',
@@ -250,7 +214,6 @@ async function handleWebhook(req, res) {
         ]
       );
     } else {
-      // ── Payment Failed or other status ──
       await client.query(
         `UPDATE telebirr_transactions SET status = 'failed', updated_at = NOW()
          WHERE merch_order_id = $1`,
@@ -269,20 +232,12 @@ async function handleWebhook(req, res) {
   }
 }
 
-/**
- * GET /api/telebirr/status/:merchOrderId
- * Checks the current status of a telebirr payment.
- * Used by the frontend success page to poll for confirmation.
- *
- * @param {string} req.params.merchOrderId - The merchant order ID to check
- * @returns {{ success: boolean, data: { status, subscriptionStatus } }}
- */
+// GET /api/telebirr/status/:merchOrderId — polled by the frontend success page
 async function checkPaymentStatus(req, res) {
   try {
     const { merchOrderId } = req.params;
     const userId = req.user.id;
 
-    // Fetch transaction status from our database
     const txResult = await pool.query(
       `SELECT tt.status AS payment_status, tt.merch_order_id,
               u.subscription_status, u.subscription_end
@@ -313,4 +268,79 @@ async function checkPaymentStatus(req, res) {
   }
 }
 
-module.exports = { initiatePayment, handleWebhook, checkPaymentStatus };
+// POST /api/telebirr/mock-payment — demo mode only, mirrors webhook logic
+async function handleMockPayment(req, res) {
+  if (!IS_DEMO_MODE) {
+    return res.status(403).json({ success: false, message: "Demo mode is not enabled" });
+  }
+
+  const client = await pool.connect();
+  try {
+    const { merchOrderId } = req.body;
+    if (!merchOrderId) {
+      return res.status(400).json({ success: false, message: "Missing merchOrderId" });
+    }
+
+    const txResult = await client.query(
+      "SELECT * FROM telebirr_transactions WHERE merch_order_id = $1",
+      [merchOrderId]
+    );
+    const transaction = txResult.rows[0];
+
+    if (!transaction || transaction.status === "success") {
+      return res.json({ success: true, message: "Already processed or invalid" });
+    }
+
+    await client.query("BEGIN");
+
+    await client.query(
+      `UPDATE telebirr_transactions SET status = 'success', updated_at = NOW()
+       WHERE merch_order_id = $1`,
+      [merchOrderId]
+    );
+
+    const paymentResult = await client.query(
+      `INSERT INTO payments (user_id, amount_etb, payment_method, transaction_ref, status, notes)
+       VALUES ($1, $2, 'TELEBIRR', $3, 'COMPLETED', 'Demo Mode Simulated Payment')
+       RETURNING id`,
+      [transaction.user_id, transaction.total_amount, `DEMO_${merchOrderId}`]
+    );
+
+    await client.query(
+      "UPDATE telebirr_transactions SET payment_id = $1 WHERE merch_order_id = $2",
+      [paymentResult.rows[0].id, merchOrderId]
+    );
+
+    // 4. Activate subscription
+    const planResult = await client.query(
+      "SELECT duration_days, name FROM subscription_plans WHERE id = $1",
+      [transaction.subscription_plan_id]
+    );
+    const plan = planResult.rows[0];
+
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + (plan ? plan.duration_days : 30));
+
+    await client.query(
+      `UPDATE users
+       SET subscription_status = 'active',
+           subscription_plan_id = $1,
+           subscription_start = NOW(),
+           subscription_end = $2,
+           updated_at = NOW()
+       WHERE id = $3`,
+      [transaction.subscription_plan_id, endDate, transaction.user_id]
+    );
+
+    await client.query("COMMIT");
+    res.json({ success: true, message: "Mock payment processed successfully" });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Mock payment error:", err);
+    res.status(500).json({ success: false, message: "Failed to process mock payment" });
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = { initiatePayment, handleWebhook, checkPaymentStatus, handleMockPayment };
