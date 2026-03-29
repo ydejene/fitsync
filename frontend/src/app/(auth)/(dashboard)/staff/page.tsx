@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { apiFetch } from "@/lib/api.server";
 import { formatDate } from "@/utils";
 import Link from "next/link";
@@ -18,8 +18,7 @@ async function getStaffMembers() {
 }
 
 export default async function StaffPage() {
-  // strictly Admin only
-  await requireAdmin();
+  await requireOwner();
   const staffMembers = await getStaffMembers();
 
   return (
