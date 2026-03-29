@@ -142,7 +142,7 @@ export default function Sidebar({ user, open, onClose }: Props) {
             </>
           )}
           {visible.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href + "/"));
 
             return (
               <Link

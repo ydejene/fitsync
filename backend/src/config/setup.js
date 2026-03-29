@@ -182,6 +182,41 @@ async function setup() {
       END $$;
     `);
 
+    // Add updated_at to memberships if missing
+    await client.query(`
+      DO $$ BEGIN
+        ALTER TABLE memberships ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+
+    // Add subscription columns to users if missing
+    await client.query(`
+      DO $$ BEGIN
+        ALTER TABLE users ADD COLUMN subscription_status VARCHAR(20) DEFAULT 'pending'
+          CHECK (subscription_status IN ('pending','active','expired','cancelled'));
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+    await client.query(`
+      DO $$ BEGIN
+        ALTER TABLE users ADD COLUMN subscription_plan_id UUID REFERENCES subscription_plans(id);
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+    await client.query(`
+      DO $$ BEGIN
+        ALTER TABLE users ADD COLUMN subscription_start DATE;
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+    await client.query(`
+      DO $$ BEGIN
+        ALTER TABLE users ADD COLUMN subscription_end DATE;
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+
     // Add reset_password_token to users if missing
     await client.query(`
       DO $$ BEGIN
