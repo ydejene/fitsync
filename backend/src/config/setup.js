@@ -182,6 +182,22 @@ async function setup() {
       END $$;
     `);
 
+    // Add reset_password_token to users if missing
+    await client.query(`
+      DO $$ BEGIN
+        ALTER TABLE users ADD COLUMN reset_password_token VARCHAR(255);
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+
+    // Add reset_password_expires to users if missing
+    await client.query(`
+      DO $$ BEGIN
+        ALTER TABLE users ADD COLUMN reset_password_expires TIMESTAMPTZ;
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+
     console.log("Schema migrations complete.");
 
     // ── Performance indexes for Insights queries ──
