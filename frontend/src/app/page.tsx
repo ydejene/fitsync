@@ -44,9 +44,9 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-text-primary text-white">
         <div className="absolute inset-0">
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
-            style={{ backgroundImage: "url('/gym.png')" }} 
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/gym.png')" }}
           />
           {/* Dark overlay to ensure text readability */}
           <div className="absolute inset-0 bg-black/70" />
@@ -67,7 +67,7 @@ export default function LandingPage() {
             <FadeIn delay={0.2}>
               <p className="text-lg text-gray-300 mb-10 max-w-xl leading-relaxed">
                 The all-in-one gym management platform that streamlines operations.
-                Handle payments, memberships, bookings, and analytics — all from one
+                Handle payments, memberships, bookings, and analytics  all from one
                 beautiful dashboard.
               </p>
             </FadeIn>
@@ -209,9 +209,8 @@ export default function LandingPage() {
                     {Array.from({ length: 5 }).map((_, i) => (
                       <i
                         key={i}
-                        className={`fa-solid fa-star text-xs ${
-                          i < review.rating ? "text-amber-400" : "text-gray-200"
-                        }`}
+                        className={`fa-solid fa-star text-xs ${i < review.rating ? "text-amber-400" : "text-gray-200"
+                          }`}
                       />
                     ))}
                   </div>
@@ -277,49 +276,47 @@ export default function LandingPage() {
               },
             ].map((plan, i) => (
               <StaggerItem key={plan.name} className="flex" direction={i === 0 ? "left" : i === 2 ? "right" : "up"}>
-                  <div
-                    className={`rounded-xl p-8 border-2 relative flex flex-col w-full ${
-                      plan.highlight
-                        ? "border-brand-orange bg-white shadow-lg"
-                        : "border-border-base bg-white"
+                <div
+                  className={`rounded-xl p-8 border-2 relative flex flex-col w-full ${plan.highlight
+                      ? "border-brand-orange bg-white shadow-lg"
+                      : "border-border-base bg-white"
                     }`}
-                  >
-                    {plan.highlight && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-brand-orange text-white text-xs font-bold rounded-full tracking-wide">
-                        Most Popular
-                      </span>
-                    )}
-                    <div className="mb-6">
-                      <h3 className="font-display text-xl font-bold text-text-primary">{plan.name}</h3>
-                      <p className="text-xs text-text-secondary mt-1">{plan.desc}</p>
-                      <div className="mt-5 flex items-baseline gap-1">
-                        <span className="text-sm font-semibold text-text-secondary">ETB</span>
-                        <span className="font-display text-4xl font-bold text-text-primary">{plan.price}</span>
-                        <span className="text-text-secondary text-sm">{plan.cycle}</span>
-                      </div>
+                >
+                  {plan.highlight && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-brand-orange text-white text-xs font-bold rounded-full tracking-wide">
+                      Most Popular
+                    </span>
+                  )}
+                  <div className="mb-6">
+                    <h3 className="font-display text-xl font-bold text-text-primary">{plan.name}</h3>
+                    <p className="text-xs text-text-secondary mt-1">{plan.desc}</p>
+                    <div className="mt-5 flex items-baseline gap-1">
+                      <span className="text-sm font-semibold text-text-secondary">ETB</span>
+                      <span className="font-display text-4xl font-bold text-text-primary">{plan.price}</span>
+                      <span className="text-text-secondary text-sm">{plan.cycle}</span>
                     </div>
-                    <div className="border-t border-border-base pt-5 mb-8 flex-1">
-                      <ul className="space-y-3">
-                        {plan.features.map((f) => (
-                          <li key={f} className="flex items-center gap-2.5 text-sm text-text-primary">
-                            <i className="fa-solid fa-check text-brand-orange text-xs" />
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <CTAButton
-                      href="/login"
-                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-lg text-sm font-semibold transition-all ${
-                        plan.highlight
-                          ? "bg-brand-orange text-white hover:bg-brand-orange-dark"
-                          : "border border-border-base text-text-primary hover:bg-brand-off-white"
-                      }`}
-                    >
-                      <i className="fa-solid fa-mobile-screen text-xs" />
-                     Get Started
-                    </CTAButton>
                   </div>
+                  <div className="border-t border-border-base pt-5 mb-8 flex-1">
+                    <ul className="space-y-3">
+                      {plan.features.map((f) => (
+                        <li key={f} className="flex items-center gap-2.5 text-sm text-text-primary">
+                          <i className="fa-solid fa-check text-brand-orange text-xs" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <CTAButton
+                    href="/login"
+                    className={`flex items-center justify-center gap-2 w-full py-3 rounded-lg text-sm font-semibold transition-all ${plan.highlight
+                        ? "bg-brand-orange text-white hover:bg-brand-orange-dark"
+                        : "border border-border-base text-text-primary hover:bg-brand-off-white"
+                      }`}
+                  >
+                    <i className="fa-solid fa-mobile-screen text-xs" />
+                    Get Started
+                  </CTAButton>
+                </div>
               </StaggerItem>
             ))}
           </StaggerContainer>
