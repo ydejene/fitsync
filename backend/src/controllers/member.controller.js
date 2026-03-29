@@ -60,7 +60,7 @@ async function getMembers(req, res) {
 async function getMemberById(req, res) {
   try {
     const { rows } = await pool.query(
-      "SELECT id, full_name, email, phone, address, gender, status, dob, created_at FROM users WHERE id = $1 AND role = 'MEMBER'",
+      "SELECT id, full_name, email, phone, address, gender, status, dob, whatsapp_number, emergency_contact, profile_photo_url, created_at FROM users WHERE id = $1 AND role = 'MEMBER'",
       [req.params.id]
     );
     if (!rows[0])
@@ -93,6 +93,8 @@ async function createMember(req, res) {
     const phone = normalizeOptionalString(req.body.phone);
     const dateOfBirth = normalizeOptionalString(req.body.dateOfBirth);
     const address = normalizeOptionalString(req.body.address);
+    const whatsappNumber = normalizeOptionalString(req.body.whatsappNumber);
+    const emergencyContact = normalizeOptionalString(req.body.emergencyContact);
 
     if (!fullName) {
       return res.status(400).json({ success: false, message: "Full name is required." });
@@ -119,10 +121,10 @@ async function createMember(req, res) {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const { rows } = await pool.query(
-      `INSERT INTO users (full_name, email, password_hash, phone, address, dob, gender, role, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,'MEMBER','ACTIVE')
-       RETURNING id, full_name, email, phone, address, dob, gender, status, created_at`,
-      [fullName, email, passwordHash, phone, address, dateOfBirth, gender]
+      `INSERT INTO users (full_name, email, password_hash, phone, address, dob, gender, whatsapp_number, emergency_contact, role, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'MEMBER','ACTIVE')
+       RETURNING id, full_name, email, phone, address, dob, gender, whatsapp_number, emergency_contact, status, created_at`,
+      [fullName, email, passwordHash, phone, address, dateOfBirth, gender, whatsappNumber, emergencyContact]
     );
 
     await pool.query(
@@ -145,6 +147,9 @@ async function updateMember(req, res) {
     const address = normalizeOptionalString(req.body.address);
     const gender = normalizeRequiredString(req.body.gender);
     const status = normalizeRequiredString(req.body.status);
+    const dateOfBirth = normalizeOptionalString(req.body.dateOfBirth);
+    const whatsappNumber = normalizeOptionalString(req.body.whatsappNumber);
+    const emergencyContact = normalizeOptionalString(req.body.emergencyContact);
 
     if (!fullName) {
       return res.status(400).json({ success: false, message: "Full name is required." });
@@ -157,9 +162,10 @@ async function updateMember(req, res) {
     }
 
     const { rows } = await pool.query(
-      `UPDATE users SET full_name=$1, phone=$2, address=$3, gender=$4, status=$5, updated_at=NOW()
-       WHERE id=$6 RETURNING id, full_name, email, phone, address, gender, status`,
-      [fullName, phone, address, gender, status, req.params.id]
+      `UPDATE users SET full_name=$1, phone=$2, address=$3, gender=$4, status=$5,
+       dob=$6, whatsapp_number=$7, emergency_contact=$8, updated_at=NOW()
+       WHERE id=$9 RETURNING id, full_name, email, phone, address, gender, dob, whatsapp_number, emergency_contact, status`,
+      [fullName, phone, address, gender, status, dateOfBirth, whatsappNumber, emergencyContact, req.params.id]
     );
     res.json({ success: true, data: { member: rows[0] }, message: "Member updated" });
   } catch (err) {

@@ -9,8 +9,13 @@ import type { Gender } from "@/types";
 type MemberForm = {
   fullName: string;
   email: string;
+  password: string;
   phone: string;
   gender: Gender | "";
+  dateOfBirth: string;
+  address: string;
+  whatsappNumber: string;
+  emergencyContact: string;
 };
 
 type MemberField = keyof MemberForm;
@@ -18,8 +23,13 @@ type MemberField = keyof MemberForm;
 const INITIAL_FORM: MemberForm = {
   fullName: "",
   email: "",
+  password: "",
   phone: "",
   gender: "",
+  dateOfBirth: "",
+  address: "",
+  whatsappNumber: "",
+  emergencyContact: "",
 };
 
 export default function NewMemberPage() {
@@ -45,6 +55,11 @@ export default function NewMemberPage() {
       nextErrors.email = getRequiredFieldMessage("Email address");
     } else if (!isValidEmail(formData.email)) {
       nextErrors.email = "Please enter a valid email address.";
+    }
+    if (!formData.password.trim()) {
+      nextErrors.password = getRequiredFieldMessage("Password");
+    } else if (formData.password.trim().length < 6) {
+      nextErrors.password = "Password must be at least 6 characters.";
     }
     if (!formData.gender) {
       nextErrors.gender = getRequiredFieldMessage("Gender");
@@ -73,9 +88,13 @@ export default function NewMemberPage() {
         body: JSON.stringify({
           fullName: formData.fullName.trim(),
           email: formData.email.trim(),
-          phone: formData.phone.trim(),
+          password: formData.password.trim(),
+          phone: formData.phone.trim() || undefined,
           gender: formData.gender,
-          password: "password123",
+          dateOfBirth: formData.dateOfBirth || undefined,
+          address: formData.address.trim() || undefined,
+          whatsappNumber: formData.whatsappNumber.trim() || undefined,
+          emergencyContact: formData.emergencyContact.trim() || undefined,
         }),
       });
 
@@ -121,6 +140,7 @@ export default function NewMemberPage() {
           </div>
         )}
 
+        {/* Full Name */}
         <div>
           <label className="label" htmlFor="member-full-name">Full Name *</label>
           <input
@@ -132,7 +152,7 @@ export default function NewMemberPage() {
             aria-invalid={Boolean(fieldErrors.fullName)}
             aria-describedby={fieldErrors.fullName ? "member-full-name-error" : undefined}
             className="input"
-            placeholder="e.g. Abebe Tadesse"
+            placeholder="e.g. John Doe"
           />
           {fieldErrors.fullName && (
             <p id="member-full-name-error" className="mt-1 text-xs text-red-600">
@@ -141,6 +161,7 @@ export default function NewMemberPage() {
           )}
         </div>
 
+        {/* Email + Password */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="label" htmlFor="member-email">Email Address *</label>
@@ -153,7 +174,7 @@ export default function NewMemberPage() {
               aria-invalid={Boolean(fieldErrors.email)}
               aria-describedby={fieldErrors.email ? "member-email-error" : undefined}
               className="input"
-              placeholder="member@fitsync.et"
+              placeholder="member@example.com"
               autoComplete="email"
             />
             {fieldErrors.email && (
@@ -163,6 +184,30 @@ export default function NewMemberPage() {
             )}
           </div>
 
+          <div>
+            <label className="label" htmlFor="member-password">Password *</label>
+            <input
+              id="member-password"
+              type="password"
+              required
+              value={formData.password}
+              onChange={(e) => updateField("password", e.target.value)}
+              aria-invalid={Boolean(fieldErrors.password)}
+              aria-describedby={fieldErrors.password ? "member-password-error" : undefined}
+              className="input"
+              placeholder="Min. 6 characters"
+              autoComplete="new-password"
+            />
+            {fieldErrors.password && (
+              <p id="member-password-error" className="mt-1 text-xs text-red-600">
+                {fieldErrors.password}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Gender + Date of Birth */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="label" htmlFor="member-gender">Gender *</label>
             <select
@@ -185,26 +230,86 @@ export default function NewMemberPage() {
               </p>
             )}
           </div>
+
+          <div>
+            <label className="label" htmlFor="member-dob">
+              Date of Birth
+              <span className="ml-1 text-gray-400 font-normal">(optional)</span>
+            </label>
+            <input
+              id="member-dob"
+              type="date"
+              value={formData.dateOfBirth}
+              onChange={(e) => updateField("dateOfBirth", e.target.value)}
+              className="input"
+            />
+          </div>
         </div>
 
+        {/* Phone + WhatsApp */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="label" htmlFor="member-phone">
+              Phone Number
+              <span className="ml-1 text-gray-400 font-normal">(optional)</span>
+            </label>
+            <input
+              id="member-phone"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => updateField("phone", e.target.value)}
+              className="input"
+              placeholder="+1 234 567 8900"
+              autoComplete="tel"
+            />
+          </div>
+
+          <div>
+            <label className="label" htmlFor="member-whatsapp">
+              WhatsApp Number
+              <span className="ml-1 text-gray-400 font-normal">(optional)</span>
+            </label>
+            <input
+              id="member-whatsapp"
+              type="tel"
+              value={formData.whatsappNumber}
+              onChange={(e) => updateField("whatsappNumber", e.target.value)}
+              className="input"
+              placeholder="+1 234 567 8900"
+            />
+          </div>
+        </div>
+
+        {/* Address */}
         <div>
-          <label className="label" htmlFor="member-phone">
-            Phone Number
+          <label className="label" htmlFor="member-address">
+            Address
             <span className="ml-1 text-gray-400 font-normal">(optional)</span>
           </label>
           <input
-            id="member-phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => updateField("phone", e.target.value)}
+            id="member-address"
+            type="text"
+            value={formData.address}
+            onChange={(e) => updateField("address", e.target.value)}
             className="input"
-            placeholder="+251 9XX XXX XXX"
-            autoComplete="tel"
+            placeholder="Street address, city"
           />
         </div>
 
-        <div className="rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] px-4 py-3 text-sm text-[#6B6B6B]">
-          New member accounts currently use the team default starter password and should be updated during onboarding.
+        {/* Emergency Contact */}
+        <div>
+          <label className="label" htmlFor="member-emergency">
+            Emergency Contact
+            <span className="ml-1 text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input
+            id="member-emergency"
+            type="text"
+            value={formData.emergencyContact}
+            onChange={(e) => updateField("emergencyContact", e.target.value)}
+            className="input"
+            placeholder="Name — phone number"
+          />
         </div>
 
         <button

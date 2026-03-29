@@ -64,4 +64,85 @@ async function getDashboardStats(_req, res) {
   }
 }
 
-module.exports = { getDashboardStats };
+// GET /api/dashboard/member — member's own dashboard data
+async function getMemberDashboard(req, res) {
+  try {
+    const userId = req.user.id;
+    const now = new Date();
+
+    // Current / most recent membership
+    const { rows: memberships } = await pool.query(`
+      SELECT m.*, p.name AS plan_name, p.price_etb, p.billing_cycle, p.duration_days, p.features
+      FROM memberships m
+      JOIN plans p ON p.id = m.plan_id
+      WHERE m.user_id = $1
+      ORDER BY m.end_date DESC
+    `, [userId]);
+
+    const activeMembership = memberships.find(
+      (m) => new Date(m.end_date) >= now
+    ) || memberships[0] || null;
+
+    // Upcoming classes (booked, not cancelled, in the future)
+    const { rows: upcomingClasses } = await pool.query(`
+      SELECT b.id AS booking_id, b.attended, c.name, c.instructor, c.location, c.schedule_at, c.duration_min
+      FROM bookings b
+      JOIN classes c ON c.id = b.class_id
+      WHERE b.user_id = $1 AND b.cancelled = FALSE AND c.schedule_at >= $2
+      ORDER BY c.schedule_at ASC
+      LIMIT 5
+    `, [userId, now]);
+
+    // Recent payments
+    const { rows: recentPayments } = await pool.query(`
+      SELECT p.id, p.amount_etb, p.payment_method, p.status, p.paid_at, pl.name AS plan_name
+      FROM payments p
+      LEFT JOIN memberships m ON m.id = p.membership_id
+      LEFT JOIN plans pl ON pl.id = m.plan_id
+      WHERE p.user_id = $1
+      ORDER BY p.paid_at DESC
+      LIMIT 5
+    `, [userId]);
+
+    // Attendance stats (last 30 days)
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const { rows: [attendanceStats] } = await pool.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE attended = TRUE) AS attended,
+        COUNT(*) FILTER (WHERE cancelled = TRUE) AS cancelled,
+        COUNT(*) AS total
+      FROM bookings
+      WHERE user_id = $1 AND booked_at >= $2
+    `, [userId, thirtyDaysAgo]);
+
+    // Days left on membership
+    let daysLeft = null;
+    if (activeMembership) {
+      const end = new Date(activeMembership.end_date);
+      daysLeft = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
+    res.json({
+      success: true,
+      data: {
+        activeMembership,
+        memberships,
+        daysLeft,
+        upcomingClasses,
+        recentPayments,
+        attendance: {
+          attended: parseInt(attendanceStats.attended) || 0,
+          cancelled: parseInt(attendanceStats.cancelled) || 0,
+          total: parseInt(attendanceStats.total) || 0,
+        },
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports = { getDashboardStats, getMemberDashboard };
