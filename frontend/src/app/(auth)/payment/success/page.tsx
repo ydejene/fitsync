@@ -59,7 +59,7 @@ export default function PaymentSuccessPage() {
     }, 2000);
 
     return () => clearInterval(pollInterval);
-  }, [BACKEND_URL, status]);
+  }, [status]);
 
   return (
     <div className="min-h-screen bg-brand-off-white flex items-center justify-center px-4 font-sans">
