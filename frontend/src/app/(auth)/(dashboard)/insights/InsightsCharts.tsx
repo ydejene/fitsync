@@ -96,14 +96,14 @@ function KpiCard({ label, value, icon, color, subtext }: {
   label: string; value: string; icon: string; color: string; subtext?: string;
 }) {
   return (
-    <div className="bg-white p-4 rounded-2xl border border-[#E5E5E5] shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow min-w-0">
+    <div className="bg-white p-4 rounded-2xl border border-[#E5E5E5] shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow min-w-0 h-full">
       <div className={`rounded-xl p-2.5 shrink-0 ${color}`}>
         <i className={`fa-solid ${icon} text-base`} />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-lg sm:text-xl font-bold text-gray-900 leading-tight break-all">{value}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{label}</p>
-        {subtext && <p className="text-[10px] text-gray-400 mt-0.5">{subtext}</p>}
+        <p className="text-xs font-medium text-gray-500 mb-0.5">{label}</p>
+        <p className="text-lg sm:text-xl font-bold text-gray-900 leading-tight truncate" title={value}>{value}</p>
+        {subtext && <p className="text-[10px] text-gray-400 mt-0.5 truncate">{subtext}</p>}
       </div>
     </div>
   );
