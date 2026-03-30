@@ -15,8 +15,6 @@ export default function PaymentSuccessPage() {
   const [status, setStatus] = useState<"checking" | "success" | "pending" | "failed">("checking");
   const [subscriptionEnd, setSubscriptionEnd] = useState("");
 
-  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-
   useEffect(() => {
     const merchOrderId =
       typeof window !== "undefined"
@@ -37,8 +35,7 @@ export default function PaymentSuccessPage() {
 
       try {
         const res = await fetch(
-          `${BACKEND_URL}/api/telebirr/status/${merchOrderId}`,
-          { credentials: "include" }
+          `/api/telebirr/status/${merchOrderId}`
         );
         const data = await res.json();
 
@@ -62,17 +59,14 @@ export default function PaymentSuccessPage() {
     }, 2000);
 
     return () => clearInterval(pollInterval);
-  }, [BACKEND_URL, status]);
+  }, [status]);
 
   return (
     <div className="min-h-screen bg-brand-off-white flex items-center justify-center px-4 font-sans">
       <div className="w-full max-w-md text-center">
         {/* Logo */}
-        <Link href="/" className="inline-flex items-center gap-2 mb-8">
-          <div className="w-10 h-10 bg-brand-orange rounded-xl flex items-center justify-center">
-            <i className="fa-solid fa-dumbbell text-white" />
-          </div>
-          <span className="font-display text-2xl font-bold text-text-primary">FitSync</span>
+        <Link href="/" className="inline-flex items-center mb-6">
+          <img src="/logo.png" alt="FitSync Logo" className="h-10 w-auto object-contain" />
         </Link>
 
         <div className="card p-8">
@@ -111,10 +105,10 @@ export default function PaymentSuccessPage() {
                 </p>
               )}
               <button
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push("/insights")}
                 className="btn-primary w-full justify-center py-3 mt-4"
               >
-                <i className="fa-solid fa-gauge-high text-xs" /> Go to Dashboard
+                <i className="fa-solid fa-gauge-high text-xs" /> Go to Insights
               </button>
             </div>
           )}
@@ -136,7 +130,7 @@ export default function PaymentSuccessPage() {
                 onClick={() => router.push("/insights")}
                 className="btn-primary w-full justify-center py-3 mt-4"
               >
-                <i className="fa-solid fa-gauge-high text-xs" /> Go to Dashboard
+                <i className="fa-solid fa-gauge-high text-xs" /> Go to Insights
               </button>
             </div>
           )}

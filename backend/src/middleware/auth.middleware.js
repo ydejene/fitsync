@@ -25,11 +25,19 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-function requireAdminOrStaff(req, res, next) {
-  if (!["ADMIN", "STAFF"].includes(req.user?.role)) {
-    return res.status(403).json({ success: false, message: "Staff access required" });
+function requireOwner(req, res, next) {
+  if (!["ADMIN", "OWNER"].includes(req.user?.role)) {
+    return res.status(403).json({ success: false, message: "Owner access required" });
   }
   next();
 }
 
-module.exports = { authenticate, requireAdmin, requireAdminOrStaff };
+function requireAdminOrStaff(req, res, next) {
+  // Now includes 'OWNER' so Gym Owners can see their analytics/insights
+  if (!["ADMIN", "STAFF", "OWNER"].includes(req.user?.role)) {
+    return res.status(403).json({ success: false, message: "Authorized access required" });
+  }
+  next();
+}
+
+module.exports = { authenticate, requireAdmin, requireOwner, requireAdminOrStaff };

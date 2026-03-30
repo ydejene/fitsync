@@ -13,6 +13,15 @@ async function getPayments(req, res) {
       conditions.push(`p.user_id = $${params.length}`);
     }
 
+    // Role-based filtering for multi-tenancy
+    // OWNER/STAFF see Gym Income (Membership payments)
+    // ADMIN see Platform Revenue (Owner Subscriptions)
+    if (["OWNER", "STAFF"].includes(req.user.role)) {
+      conditions.push("p.membership_id IS NOT NULL");
+    } else if (req.user.role === "ADMIN") {
+      conditions.push("p.membership_id IS NULL");
+    }
+
     const where = conditions.length ? "WHERE " + conditions.join(" AND ") : "";
     params.push(parseInt(limit), offset);
 
@@ -32,7 +41,8 @@ async function getPayments(req, res) {
       `SELECT COUNT(*) FROM payments p ${where}`, countParams
     );
     const { rows: totals } = await pool.query(
-      "SELECT COALESCE(SUM(amount_etb),0) AS total FROM payments WHERE status='COMPLETED'"
+      `SELECT COALESCE(SUM(amount_etb),0) AS total FROM payments p ${where} AND status='COMPLETED'`,
+      countParams
     );
 
     const total = parseInt(countRows[0].count);

@@ -27,24 +27,29 @@ const languages = [
 ];
 
 export default function GoogleTranslate() {
-  const [currentLang, setCurrentLang] = useState(() => {
-    if (typeof document === "undefined") return "en";
-
-    const cookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("googtrans="));
-
-    const lang = cookie?.split("/").pop();
-    return lang && lang !== "en" ? lang : "en";
-  });
+  const [mounted, setMounted] = useState(false);
+  const [currentLang, setCurrentLang] = useState("en");
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setMounted(true);
+    
+    // Read initial language from cookie
+    const cookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("googtrans="));
+    const lang = cookie?.split("/").pop();
+    if (lang && lang !== "en") {
+      setCurrentLang(lang);
+    }
+
+    // Load Google Translate script
     // Load Google Translate script
     if (document.getElementById("google-translate-script")) return;
 
     window.googleTranslateElementInit = () => {
+<<<<<<< HEAD
       if (window.google?.translate) {
         new window.google.translate.TranslateElement(
           {
@@ -55,6 +60,17 @@ export default function GoogleTranslate() {
           "google_translate_hidden"
         );
       }
+=======
+      if (!window.google) return;
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: "en",
+          includedLanguages: "am,en",
+          autoDisplay: false,
+        },
+        "google_translate_hidden"
+      );
+>>>>>>> 037780c00024dd14c0462e452f4df7c3f3cc755a
     };
 
     const script = document.createElement("script");

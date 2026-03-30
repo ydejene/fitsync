@@ -57,9 +57,6 @@ export default async function BookingsPage() {
                     <h3 className="text-lg font-bold text-[#1A1A1A] leading-tight">
                       {cls.name}
                     </h3>
-                    {cls.name_am && (
-                      <p className="text-xs text-[#9CA3AF] mt-0.5">{cls.name_am}</p>
-                    )}
                   </div>
                   <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-full ${
                     isFull ? "bg-red-50 text-red-600" : "bg-green-50 text-green-700"

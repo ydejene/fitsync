@@ -13,6 +13,15 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(body),
     });
 
+    const contentType = backendRes.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      console.error("Google auth: backend returned non-JSON", backendRes.status);
+      return NextResponse.json(
+        { success: false, message: "Backend unavailable. Please try again shortly." },
+        { status: 503 }
+      );
+    }
+
     const data = await backendRes.json();
 
     if (!backendRes.ok || !data.success) {
@@ -33,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (err) {
-    console.error("Google login proxy error:", err);
+    console.error("Google auth proxy error:", err);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
       { status: 500 }

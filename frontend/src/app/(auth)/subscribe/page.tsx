@@ -85,11 +85,10 @@ export default function SubscribePage() {
     setError("");
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/telebirr/initiate`, {
+      const res = await fetch(`/api/telebirr/initiate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ planId }),
-        credentials: "include",
       });
 
       const data = await res.json();
@@ -146,11 +145,8 @@ export default function SubscribePage() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-brand-orange rounded-xl flex items-center justify-center">
-              <i className="fa-solid fa-dumbbell text-white" />
-            </div>
-            <span className="font-display text-2xl font-bold text-text-primary">FitSync</span>
+          <Link href="/" className="inline-flex items-center mb-6 hover:opacity-85 transition-opacity">
+            <img src="/logo.png" alt="FitSync Logo" className="h-10 md:h-12 w-auto object-contain" />
           </Link>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">
             Choose Your Plan

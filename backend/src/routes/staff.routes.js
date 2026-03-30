@@ -1,8 +1,8 @@
 const { Router } = require("express");
 const { getStaff, createStaff, getStaffPermissions, updateStaffPermissions } = require("../controllers/staff.controller");
-const { authenticate, requireAdmin } = require("../middleware/auth.middleware");
+const { authenticate, requireOwner } = require("../middleware/auth.middleware");
 const router = Router();
-router.use(authenticate, requireAdmin);
+router.use(authenticate, requireOwner);
 router.get("/", getStaff);
 router.post("/", createStaff);
 router.get("/:id/permissions", getStaffPermissions);

@@ -8,7 +8,6 @@ import { clientFetch } from "@/lib/api";
 interface ClassData {
   id: string;
   name: string;
-  name_am: string | null;
   instructor: string | null;
   location: string | null;
   schedule_at: string;
@@ -46,7 +45,6 @@ export default function ManageClassPage() {
   // Edit form state
   const [form, setForm] = useState({
     name: "",
-    nameAm: "",
     instructor: "",
     location: "",
     scheduleAt: "",
@@ -64,7 +62,6 @@ export default function ManageClassPage() {
         const c = result.data.fitnessClass;
         setForm({
           name: c.name || "",
-          nameAm: c.name_am || "",
           instructor: c.instructor || "",
           location: c.location || "",
           scheduleAt: c.schedule_at ? new Date(c.schedule_at).toISOString().slice(0, 16) : "",
@@ -98,7 +95,6 @@ export default function ManageClassPage() {
         method: "PATCH",
         body: JSON.stringify({
           name: form.name,
-          nameAm: form.nameAm || null,
           instructor: form.instructor || null,
           location: form.location || null,
           scheduleAt: form.scheduleAt,
@@ -235,7 +231,6 @@ export default function ManageClassPage() {
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-2xl font-bold text-[#1A1A1A]">{cls.name}</h1>
-              {cls.name_am && <span className="text-sm text-[#9CA3AF]">({cls.name_am})</span>}
               {isPast && (
                 <span className="text-[10px] uppercase font-bold px-2 py-1 rounded-full bg-gray-100 text-gray-500">Past</span>
               )}
@@ -426,23 +421,13 @@ export default function ManageClassPage() {
 
           <div className="space-y-5">
             {/* Name */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-[#9CA3AF] uppercase tracking-wide mb-2">Class Name *</label>
-                <input
-                  type="text" name="name" value={form.name} onChange={handleFormChange}
-                  className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#F15A24] focus:border-transparent"
-                  placeholder="e.g. Morning Yoga"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#9CA3AF] uppercase tracking-wide mb-2">Name (Amharic)</label>
-                <input
-                  type="text" name="nameAm" value={form.nameAm} onChange={handleFormChange}
-                  className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#F15A24] focus:border-transparent"
-                  placeholder="Optional"
-                />
-              </div>
+            <div>
+              <label className="block text-xs font-semibold text-[#9CA3AF] uppercase tracking-wide mb-2">Class Name *</label>
+              <input
+                type="text" name="name" value={form.name} onChange={handleFormChange}
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#F15A24] focus:border-transparent"
+                placeholder="e.g. Morning Yoga"
+              />
             </div>
 
             {/* Instructor & Location */}

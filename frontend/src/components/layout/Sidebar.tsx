@@ -108,11 +108,8 @@ export default function Sidebar({ user, open, onClose }: Props) {
       >
         {/* Logo */}
         <div className="h-16 px-5 flex items-center justify-between border-b border-[#E5E5E5]">
-          <Link href="/dashboard" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity cursor-pointer">
-            <div className="w-8 h-8 bg-[#F15A24] rounded-lg flex items-center justify-center shrink-0">
-              <i className="fa-solid fa-dumbbell text-white text-xs" />
-            </div>
-            <span className="font-[family-name:var(--font-barlow)] text-lg font-bold text-[#1A1A1A]">FitSync</span>
+          <Link href="/insights" className="flex items-center hover:opacity-85 transition-opacity cursor-pointer">
+            <img src="/logo.png" alt="FitSync Logo" className="h-8 md:h-10 w-auto object-contain" />
           </Link>
           {/* Close button — mobile only */}
           <button
@@ -127,8 +124,25 @@ export default function Sidebar({ user, open, onClose }: Props) {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Main Navigation">
+          {/* Admin-only return link — pinned at top */}
+          {user.role === "ADMIN" && (
+            <>
+              <Link
+                href="/admin"
+                onClick={onClose}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all bg-[#F15A24]/10 text-[#F15A24] border border-[#F15A24]/20 hover:bg-[#F15A24]/15 mb-2"
+              >
+                <div className="w-6 flex justify-center items-center">
+                  <i className="fa-solid fa-shield-halved text-sm text-[#F15A24]" />
+                </div>
+                <span className="text-[14px] leading-none">Admin Console</span>
+                <i className="fa-solid fa-arrow-right text-[10px] ml-auto" />
+              </Link>
+              <div className="border-t border-[#E5E5E5] mb-2" />
+            </>
+          )}
           {visible.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href + "/"));
 
             return (
               <Link
@@ -153,7 +167,20 @@ export default function Sidebar({ user, open, onClose }: Props) {
         </nav>
 
         {/* Bottom */}
-        <div className="px-3 py-4 border-t border-[#E5E5E5]">
+        <div className="px-3 py-4 border-t border-[#E5E5E5] space-y-2">
+          {user.role === "OWNER" && (
+            <a
+              href="https://t.me/Niyo11"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-[#0088cc]/10 text-[#0088cc] border border-[#0088cc]/20 hover:bg-[#0088cc]/15 mb-4"
+            >
+              <div className="w-5 flex justify-center items-center">
+                <i className="fa-brands fa-telegram text-sm" />
+              </div>
+              <span>Request Member App</span>
+            </a>
+          )}
           <button
             type="button"
             onClick={handleLogout}

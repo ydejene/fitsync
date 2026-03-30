@@ -1,7 +1,9 @@
 const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const { OAuth2Client } = require("google-auth-library");
+const { sendResetPasswordEmail } = require("../utils/emailService");
 const {
   isValidEmail,
   normalizeRequiredString,
@@ -33,9 +35,6 @@ async function getStaffPermissionsForUser(userId) {
   };
 }
 
-/**
- * Helper to format user object for responses
- */
 function formatUserResponse(user, permissions) {
   const result = {
     id: user.id,
@@ -348,4 +347,103 @@ async function me(req, res) {
   }
 }
 
-module.exports = { register, login, googleLogin, logout, me };
+/**
+ * POST /api/auth/forgot-password
+ * Generates a reset token and sends it via email.
+ */
+async function forgotPassword(req, res) {
+  try {
+    const email = normalizeRequiredString(req.body.email);
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ success: false, message: "Valid email is required." });
+    }
+
+    const { rows } = await pool.query("SELECT id, full_name, email FROM users WHERE email = $1", [email]);
+    const user = rows[0];
+
+    if (!user) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "No account found with this email address. Please check your spelling or register a new account." 
+      });
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const expires = new Date(Date.now() + 3600000); // 1 hour
+
+    await pool.query(
+      "UPDATE users SET reset_password_token = $1, reset_password_expires = $2 WHERE id = $3",
+      [token, expires, user.id]
+    );
+
+    const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${token}`;
+    try {
+      await sendResetPasswordEmail(user.email, user.full_name, resetUrl);
+    } catch (emailErr) {
+      console.error("Email service failed:", emailErr.message);
+      // In dev, log the reset link to console so you can test without real SMTP
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[DEV] Reset link for ${user.email}: ${resetUrl}`);
+        return res.json({ success: true, message: "Email service failed — reset link logged to server console (Dev Mode)." });
+      }
+      throw emailErr;
+    }
+
+    res.json({ 
+      success: true, 
+      message: "A password reset link has been sent to your email address." 
+    });
+  } catch (err) {
+    console.error("Forgot Password Error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+/**
+ * POST /api/auth/reset-password
+ * Validates token and updates password.
+ */
+async function resetPassword(req, res) {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password || password.length < 8) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Token and a valid password (min 8 chars) are required." 
+      });
+    }
+
+    // Find valid token
+    const { rows } = await pool.query(
+      "SELECT id FROM users WHERE reset_password_token = $1 AND reset_password_expires > NOW()",
+      [token]
+    );
+    const user = rows[0];
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: "Password reset token is invalid or has expired." });
+    }
+
+    // Hash new password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Update user & clear token
+    await pool.query(
+      "UPDATE users SET password_hash = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2",
+      [passwordHash, user.id]
+    );
+
+    await pool.query(
+      "INSERT INTO audit_logs (actor_id, actor_email, action, entity_type, entity_id) VALUES ($1,$2,$3,$4,$5)",
+      [user.id, null, "RESET_PASSWORD", "user", user.id]
+    );
+
+    res.json({ success: true, message: "Password has been reset successfully. You can now log in." });
+  } catch (err) {
+    console.error("Reset Password Error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports = { register, login, googleLogin, logout, me, forgotPassword, resetPassword };

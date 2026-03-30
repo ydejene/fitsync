@@ -1,5 +1,6 @@
 import Link from "next/link";
 import GoogleTranslate from "@/components/GoogleTranslate";
+import CalendlyBadge from "@/components/CalendlyBadge";
 import {
   FadeIn,
   StaggerContainer,
@@ -14,27 +15,26 @@ export default function LandingPage() {
 
       {/* Nav */}
       <nav className="sticky top-0 z-50 bg-white border-b border-border-base">
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-orange rounded-lg flex items-center justify-center">
-              <i className="fa-solid fa-dumbbell text-white text-xs" />
-            </div>
-            <span className="font-display text-xl font-bold tracking-tight text-text-primary">
-              FitSync
-            </span>
-          </div>
+        <div className="max-w-6xl mx-auto px-4 md:px-6 flex items-center justify-between h-16 md:h-20">
+          <Link href="/" className="flex items-center">
+            <img 
+              src="/logo.png" 
+              alt="FitSync Logo" 
+              className="h-10 md:h-14 w-auto object-contain transition-all"
+            />
+          </Link>
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm text-text-secondary hover:text-brand-orange transition-colors">Features</a>
             <a href="#reviews" className="text-sm text-text-secondary hover:text-brand-orange transition-colors">Reviews</a>
             <a href="#plans" className="text-sm text-text-secondary hover:text-brand-orange transition-colors">Pricing</a>
             <a href="#contact" className="text-sm text-text-secondary hover:text-brand-orange transition-colors">Contact</a>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-4">
             <GoogleTranslate />
-            <Link href="/login" className="text-sm font-medium text-text-primary hover:text-brand-orange transition-colors">
+            <Link href="/login" className="text-xs md:text-sm font-medium text-text-primary hover:text-brand-orange transition-colors whitespace-nowrap">
               Sign in
             </Link>
-            <CTAButton href="/login" className="btn-primary text-sm">
+            <CTAButton href="/login" className="btn-primary px-3 py-1.5 md:px-5 md:py-2 text-[10px] md:text-sm whitespace-nowrap">
               Get Started
             </CTAButton>
           </div>
@@ -43,10 +43,13 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-text-primary text-white">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(241,90,36,0.3) 40px, rgba(241,90,36,0.3) 41px), repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(241,90,36,0.3) 40px, rgba(241,90,36,0.3) 41px)"
-          }} />
+        <div className="absolute inset-0">
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/gym.png')" }}
+          />
+          {/* Dark overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-black/70" />
         </div>
         <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
@@ -64,17 +67,17 @@ export default function LandingPage() {
             <FadeIn delay={0.2}>
               <p className="text-lg text-gray-300 mb-10 max-w-xl leading-relaxed">
                 The all-in-one gym management platform that streamlines operations.
-                Handle payments, memberships, bookings, and analytics — all from one
+                Handle payments, memberships, bookings, and analytics  all from one
                 beautiful dashboard.
               </p>
             </FadeIn>
             <FadeIn delay={0.3} direction="scale">
               <div className="flex flex-wrap items-center justify-center gap-4">
-                <CTAButton href="/login" className="btn-primary px-8 py-3.5 text-base">
+                <CTAButton href="/login" className="btn-primary px-8 py-3.5 text-base shadow-lg shadow-brand-orange/20">
                   Start Free Trial
                   <i className="fa-solid fa-arrow-right text-xs" />
                 </CTAButton>
-                <CTAButton href="#features" className="flex items-center gap-2 text-gray-300 hover:text-white text-sm font-medium transition-colors border border-white/20 px-6 py-3.5 rounded-lg">
+                <CTAButton href="#features" className="hidden sm:flex items-center gap-2 text-gray-300 hover:text-white text-sm font-medium transition-colors border border-white/10 px-6 py-3.5 rounded-lg">
                   See how it works
                 </CTAButton>
               </div>
@@ -121,7 +124,7 @@ export default function LandingPage() {
           <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" stagger={0.12}>
             {[
               { icon: "fa-users", title: "Member Management", desc: "Track profiles, subscriptions, health records, and attendance — all in one view." },
-              { icon: "fa-credit-card", title: "Payment Processing", desc: "Accept mobile money, bank transfers, cash, and card payments seamlessly." },
+              { icon: "fa-money-bill-transfer", title: "Manual Payment Tracking", desc: "Track cash, bank transfers, and mobile money collections in one clear dashboard." },
               { icon: "fa-chart-line", title: "Financial Analytics", desc: "Monitor MRR, churn rate, overdue payments, and monthly revenue trends." },
               { icon: "fa-bell", title: "Expiry Alerts", desc: "Automated notifications before memberships expire — no more lost renewals." },
               { icon: "fa-calendar", title: "Class Booking", desc: "Let members book HIIT, Yoga, CrossFit sessions. Track attendance instantly." },
@@ -206,9 +209,8 @@ export default function LandingPage() {
                     {Array.from({ length: 5 }).map((_, i) => (
                       <i
                         key={i}
-                        className={`fa-solid fa-star text-xs ${
-                          i < review.rating ? "text-amber-400" : "text-gray-200"
-                        }`}
+                        className={`fa-solid fa-star text-xs ${i < review.rating ? "text-amber-400" : "text-gray-200"
+                          }`}
                       />
                     ))}
                   </div>
@@ -274,65 +276,91 @@ export default function LandingPage() {
               },
             ].map((plan, i) => (
               <StaggerItem key={plan.name} className="flex" direction={i === 0 ? "left" : i === 2 ? "right" : "up"}>
-                  <div
-                    className={`rounded-xl p-8 border-2 relative flex flex-col w-full ${
-                      plan.highlight
-                        ? "border-brand-orange bg-white shadow-lg"
-                        : "border-border-base bg-white"
+                <div
+                  className={`rounded-xl p-8 border-2 relative flex flex-col w-full ${plan.highlight
+                      ? "border-brand-orange bg-white shadow-lg"
+                      : "border-border-base bg-white"
                     }`}
-                  >
-                    {plan.highlight && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-brand-orange text-white text-xs font-bold rounded-full tracking-wide">
-                        Most Popular
-                      </span>
-                    )}
-                    <div className="mb-6">
-                      <h3 className="font-display text-xl font-bold text-text-primary">{plan.name}</h3>
-                      <p className="text-xs text-text-secondary mt-1">{plan.desc}</p>
-                      <div className="mt-5 flex items-baseline gap-1">
-                        <span className="text-sm font-semibold text-text-secondary">ETB</span>
-                        <span className="font-display text-4xl font-bold text-text-primary">{plan.price}</span>
-                        <span className="text-text-secondary text-sm">{plan.cycle}</span>
-                      </div>
+                >
+                  {plan.highlight && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-brand-orange text-white text-xs font-bold rounded-full tracking-wide">
+                      Most Popular
+                    </span>
+                  )}
+                  <div className="mb-6">
+                    <h3 className="font-display text-xl font-bold text-text-primary">{plan.name}</h3>
+                    <p className="text-xs text-text-secondary mt-1">{plan.desc}</p>
+                    <div className="mt-5 flex items-baseline gap-1">
+                      <span className="text-sm font-semibold text-text-secondary">ETB</span>
+                      <span className="font-display text-4xl font-bold text-text-primary">{plan.price}</span>
+                      <span className="text-text-secondary text-sm">{plan.cycle}</span>
                     </div>
-                    <div className="border-t border-border-base pt-5 mb-8 flex-1">
-                      <ul className="space-y-3">
-                        {plan.features.map((f) => (
-                          <li key={f} className="flex items-center gap-2.5 text-sm text-text-primary">
-                            <i className="fa-solid fa-check text-brand-orange text-xs" />
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <CTAButton
-                      href="/login"
-                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-lg text-sm font-semibold transition-all ${
-                        plan.highlight
-                          ? "bg-brand-orange text-white hover:bg-brand-orange-dark"
-                          : "border border-border-base text-text-primary hover:bg-brand-off-white"
-                      }`}
-                    >
-                      <i className="fa-solid fa-mobile-screen text-xs" />
-                     Get Started
-                    </CTAButton>
                   </div>
+                  <div className="border-t border-border-base pt-5 mb-8 flex-1">
+                    <ul className="space-y-3">
+                      {plan.features.map((f) => (
+                        <li key={f} className="flex items-center gap-2.5 text-sm text-text-primary">
+                          <i className="fa-solid fa-check text-brand-orange text-xs" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <CTAButton
+                    href="/login"
+                    className={`flex items-center justify-center gap-2 w-full py-3 rounded-lg text-sm font-semibold transition-all ${plan.highlight
+                        ? "bg-brand-orange text-white hover:bg-brand-orange-dark"
+                        : "border border-border-base text-text-primary hover:bg-brand-off-white"
+                      }`}
+                  >
+                    <i className="fa-solid fa-mobile-screen text-xs" />
+                    Get Started
+                  </CTAButton>
+                </div>
               </StaggerItem>
             ))}
           </StaggerContainer>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* FAQ */}
+      <section className="py-24 bg-white border-t border-border-base">
+        <div className="max-w-3xl mx-auto px-6">
+          <FadeIn className="text-center mb-16">
+            <span className="text-brand-orange text-sm font-semibold uppercase tracking-widest">Questions & Answers</span>
+            <h2 className="font-display text-3xl font-bold text-text-primary mt-2">Frequently Asked Questions</h2>
+          </FadeIn>
+          <div className="space-y-4">
+            {[
+              { q: "Can I track offline payments?", a: "Yes, FitSync allows you to manually record and track cash, bank transfers, and mobile money collections in a unified dashboard." },
+              { q: "Does it handle staff management?", a: "Absolutely. You can assign specific roles and permissions to your staff, ensuring they only access the data relevant to their job." },
+              { q: "Is the financial data secure?", a: "Yes. Every record includes an immutable audit log, making it easy to track changes and prevent errors or malpractice." },
+              { q: "Can members book sessions directly?", a: "Yes, our class booking feature allows members to book slots for sessions like HIIT, Yoga, and CrossFit instantly." },
+              { q: "What about membership renewals?", a: "FitSync automatically identifies expiring memberships and provides clear alerts, so you never miss a renewal conversation." },
+            ].map((faq, i) => (
+              <div key={i} className="card p-6 hover:shadow-sm transition-all border-[#E5E5E5] group">
+                <h3 className="font-display font-semibold text-text-primary mb-2 flex items-center justify-between">
+                  {faq.q}
+                  <i className="fa-solid fa-plus text-brand-orange text-xs opacity-50 group-hover:opacity-100 transition-opacity" />
+                </h3>
+                <p className="text-sm text-text-secondary leading-relaxed">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       <footer id="contact" className="bg-text-primary text-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
 
             <FadeIn direction="left" className="md:col-span-2">
-              <div className="flex items-center gap-2 mb-6">
-                <i className="fa-solid fa-dumbbell text-brand-orange text-xl" />
-                <span className="font-display text-2xl font-bold tracking-tight">FitSync</span>
-              </div>
+              <Link href="/" className="flex items-center mb-6">
+                <img 
+                  src="/logo.png" 
+                  alt="FitSync Logo" 
+                  className="h-10 md:h-12 w-auto object-contain brightness-0 invert opacity-90 transition-all hover:opacity-100" 
+                />
+              </Link>
               <p className="text-gray-400 text-sm max-w-sm leading-relaxed mb-6">
                 The leading gym management platform.
                 We simplify operations so you can focus on building a healthier community.
@@ -374,6 +402,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+      <CalendlyBadge />
     </div>
   );
 }

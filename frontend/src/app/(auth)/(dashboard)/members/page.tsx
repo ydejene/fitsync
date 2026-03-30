@@ -27,13 +27,14 @@ async function getMembersData(page: number, q: string, status: string) {
 export default async function MembersPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   await requireAdminOrStaff();
+  const params = await searchParams;
 
-  const page = parseInt(searchParams.page ?? "1");
-  const q = searchParams.q ?? "";
-  const status = searchParams.status ?? "";
+  const page = parseInt(params.page ?? "1");
+  const q = params.q ?? "";
+  const status = params.status ?? "";
   const pageSize = 20;
 
   const { members, total } = await getMembersData(page, q, status);
@@ -109,7 +110,7 @@ export default async function MembersPage({
                   </td>
                   <td className="px-4 py-3 text-[#6B6B6B] hidden md:table-cell">{member.phone ?? "—"}</td>
                   <td className="px-4 py-3 hidden lg:table-cell">
-                    <span className="text-[#1A1A1A]">{member.current_plan ?? "No plan"}</span>
+                    <span className="text-[#1A1A1A]">{member.plan_name ?? "No plan"}</span>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-medium px-2 py-1 rounded-full ${member.status === 'ACTIVE' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>

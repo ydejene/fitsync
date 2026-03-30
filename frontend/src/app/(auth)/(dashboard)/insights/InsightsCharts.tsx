@@ -96,12 +96,12 @@ function KpiCard({ label, value, icon, color, subtext }: {
   label: string; value: string; icon: string; color: string; subtext?: string;
 }) {
   return (
-    <div className="bg-white p-5 rounded-2xl border border-[#E5E5E5] shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
-      <div className={`rounded-xl p-3 ${color}`}>
-        <i className={`fa-solid ${icon} text-lg`} />
+    <div className="bg-white p-4 rounded-2xl border border-[#E5E5E5] shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow min-w-0">
+      <div className={`rounded-xl p-2.5 shrink-0 ${color}`}>
+        <i className={`fa-solid ${icon} text-base`} />
       </div>
-      <div>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-lg sm:text-xl font-bold text-gray-900 leading-tight break-all">{value}</p>
         <p className="text-xs text-gray-500 mt-0.5">{label}</p>
         {subtext && <p className="text-[10px] text-gray-400 mt-0.5">{subtext}</p>}
       </div>
@@ -177,7 +177,7 @@ export default function InsightsCharts({ data, analyticsData }: Props) {
   return (
     <div>
       {/* ── KPI Cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <KpiCard
           label="Total Members"
           value={kpis.totalMembers.toLocaleString()}
@@ -309,7 +309,6 @@ export default function InsightsCharts({ data, analyticsData }: Props) {
                     outerRadius={90}
                     paddingAngle={4}
                     dataKey="value"
-                    label={({ name, percent }: any) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                   >
                     <Cell fill="#10B981" />
                     <Cell fill="#EF4444" />
@@ -356,7 +355,6 @@ export default function InsightsCharts({ data, analyticsData }: Props) {
                       outerRadius={85}
                       paddingAngle={3}
                       dataKey="value"
-                      label={({ name, percent }: any) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                     >
                       {payments.methodBreakdown.map((m, i) => (
                         <Cell key={i} fill={METHOD_COLORS[m.payment_method] || COLORS[i % COLORS.length]} />
@@ -394,7 +392,6 @@ export default function InsightsCharts({ data, analyticsData }: Props) {
                       outerRadius={85}
                       paddingAngle={4}
                       dataKey="value"
-                      label={({ name, percent }: any) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                     >
                       {demographics.genderDistribution.map((_, i) => (
                         <Cell key={i} fill={["#3B82F6", "#EC4899", "#8B5CF6", "#6B7280"][i % 4]} />
@@ -442,7 +439,6 @@ export default function InsightsCharts({ data, analyticsData }: Props) {
                       outerRadius={90}
                       paddingAngle={4}
                       dataKey="value"
-                      label={({ name, percent }: any) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                     >
                       {memberships.batchDistribution.map((_, i) => (
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />
@@ -471,7 +467,6 @@ export default function InsightsCharts({ data, analyticsData }: Props) {
                       outerRadius={85}
                       paddingAngle={3}
                       dataKey="value"
-                      label={({ name, percent }: any) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                     >
                       <Cell fill="#10B981" /> {/* PAID */}
                       <Cell fill="#F59E0B" /> {/* UNPAID */}
@@ -640,7 +635,6 @@ export default function InsightsCharts({ data, analyticsData }: Props) {
                       paddingAngle={4}
                       dataKey="total"
                       nameKey="plan_name"
-                      label={({ plan_name, percent }: any) => `${plan_name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                     >
                       {payments.revenueByPlan.map((_, i) => (
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />

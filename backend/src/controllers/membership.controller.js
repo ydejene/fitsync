@@ -76,4 +76,48 @@ async function getPlans(_req, res) {
   }
 }
 
-module.exports = { getMemberships, createMembership, getPlans };
+// GET /api/memberships/:id  — single membership detail with member, plan & payments
+async function getMembershipById(req, res) {
+  try {
+    const { id } = req.params;
+
+    const { rows } = await pool.query(`
+      SELECT m.*,
+             u.full_name, u.email, u.phone, u.gender, u.status AS member_status, u.profile_photo_url,
+             p.name AS plan_name, p.price_etb, p.billing_cycle, p.duration_days, p.features AS plan_features
+      FROM memberships m
+      JOIN users u ON u.id = m.user_id
+      JOIN plans p ON p.id = m.plan_id
+      WHERE m.id = $1
+    `, [id]);
+
+    if (rows.length === 0)
+      return res.status(404).json({ success: false, message: "Membership not found" });
+
+    const membership = rows[0];
+
+    // Fetch payments linked to this membership
+    const { rows: payments } = await pool.query(`
+      SELECT id, amount_etb, payment_method, transaction_ref, status, notes, paid_at, created_at
+      FROM payments
+      WHERE membership_id = $1
+      ORDER BY paid_at DESC
+    `, [id]);
+
+    // Fetch other memberships for the same user (history)
+    const { rows: history } = await pool.query(`
+      SELECT m.id, m.start_date, m.end_date, m.fee_status, m.batch, m.created_at, p.name AS plan_name
+      FROM memberships m
+      JOIN plans p ON p.id = m.plan_id
+      WHERE m.user_id = $1 AND m.id != $2
+      ORDER BY m.start_date DESC
+    `, [membership.user_id, id]);
+
+    res.json({ success: true, data: { membership, payments, history } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports = { getMemberships, createMembership, getPlans, getMembershipById };
