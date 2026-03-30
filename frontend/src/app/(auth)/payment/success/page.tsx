@@ -15,8 +15,6 @@ export default function PaymentSuccessPage() {
   const [status, setStatus] = useState<"checking" | "success" | "pending" | "failed">("checking");
   const [subscriptionEnd, setSubscriptionEnd] = useState("");
 
-  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-
   useEffect(() => {
     const merchOrderId =
       typeof window !== "undefined"
@@ -37,8 +35,7 @@ export default function PaymentSuccessPage() {
 
       try {
         const res = await fetch(
-          `${BACKEND_URL}/api/telebirr/status/${merchOrderId}`,
-          { credentials: "include" }
+          `/api/telebirr/status/${merchOrderId}`
         );
         const data = await res.json();
 

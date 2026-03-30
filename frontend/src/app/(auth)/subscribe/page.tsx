@@ -85,11 +85,10 @@ export default function SubscribePage() {
     setError("");
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/telebirr/initiate`, {
+      const res = await fetch(`/api/telebirr/initiate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ planId }),
-        credentials: "include",
       });
 
       const data = await res.json();
