@@ -2,9 +2,11 @@
 
 > A full-stack SaaS platform for gym owners in Addis Ababa to manage members, staff, payments, and analytics.
 
-[![Live App](https://img.shields.io/badge/Live%20App-Render-46E3B7?logo=render)](https://fitsync-frontend-zcz8.onrender.com)
-[![API](https://img.shields.io/badge/API-Render-46E3B7?logo=render)](https://api-wyug.onrender.com)
-[![Jira Board](https://img.shields.io/badge/Jira-Board-0052CC?logo=jira)](https://alustudent-team-k1plq8kl.atlassian.net/jira/software/projects/FIT/boards/100)
+- [![Live App](https://img.shields.io/badge/Live%20App-Render-46E3B7?logo=render)](https://fitsync-frontend-zcz8.onrender.com)
+
+- [![API](https://img.shields.io/badge/API-Render-46E3B7?logo=render)](https://api-wyug.onrender.com)
+
+- [![Jira Board](https://img.shields.io/badge/Jira-Board-0052CC?logo=jira)](https://alustudent-team-k1plq8kl.atlassian.net/jira/software/projects/FIT/boards/100)
 
 ---
 
