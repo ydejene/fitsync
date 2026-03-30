@@ -16,6 +16,15 @@ export async function POST(req: NextRequest) {
     });
     console.log("[google] backend responded:", backendRes.status);
 
+    const contentType = backendRes.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      console.error("[google] backend returned non-JSON:", backendRes.status, await backendRes.text());
+      return NextResponse.json(
+        { success: false, message: "Backend unavailable. Please try again shortly." },
+        { status: 503 }
+      );
+    }
+
     const data = await backendRes.json();
 
     if (!backendRes.ok || !data.success) {
