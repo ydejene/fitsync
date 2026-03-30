@@ -45,14 +45,16 @@ export default function GoogleTranslate() {
     if (document.getElementById("google-translate-script")) return;
 
     window.googleTranslateElementInit = () => {
-      new window.google.translate.TranslateElement(
-        {
-          pageLanguage: "en",
-          includedLanguages: "am,en",
-          autoDisplay: false,
-        },
-        "google_translate_hidden"
-      );
+      if (window.google?.translate) {
+        new window.google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            includedLanguages: "am,en",
+            autoDisplay: false,
+          },
+          "google_translate_hidden"
+        );
+      }
     };
 
     const script = document.createElement("script");
