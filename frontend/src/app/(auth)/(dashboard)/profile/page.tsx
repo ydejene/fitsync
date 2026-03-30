@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { clientFetch } from "@/lib/api";
-import type { AuthUser, ApiResponse } from "@/types";
+import type { AuthUser } from "@/types";
 import { getInitials } from "@/utils";
 import { useRouter } from "next/navigation";
 
@@ -29,10 +28,9 @@ export default function ProfilePage() {
 
     try {
       // Use standard fetch for FormData since clientFetch might be JSON-only or not handle FormData
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"}/api/users/profile/photo`, {
+      const res = await fetch(`/api/users/profile/photo`, {
         method: "POST",
         body: formData,
-        credentials: "include",
       });
 
       const data = await res.json();
@@ -58,7 +56,7 @@ export default function ProfilePage() {
 
   async function fetchProfile() {
     try {
-      const res = await clientFetch<{ user: AuthUser }>("/api/auth/me");
+      const res = await fetch("/api/auth/me").then((r) => r.json()) as { success: boolean; data: { user: AuthUser } | null };
       if (res.success && res.data) {
         setUser(res.data.user);
       }
@@ -77,10 +75,11 @@ export default function ProfilePage() {
     setMessage({ text: "", type: "" });
 
     try {
-      const res = await clientFetch<any>("/api/users/profile", {
+      const res = await fetch("/api/users/profile", {
         method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user),
-      });
+      }).then((r) => r.json());
 
       if (res.success) {
         setMessage({ text: "Profile updated successfully!", type: "success" });
