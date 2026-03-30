@@ -35,6 +35,7 @@ app.use(cookieParser());
 // Required for Google OAuth popup flow
 app.use((_req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none"); 
   next();
 });
 
