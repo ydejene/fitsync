@@ -1,6 +1,6 @@
 # FitSync — Gym Management Platform
 
-> A full-stack SaaS platform for gym owners in Addis Ababa to manage members, staff, payments, and analytics.
+> A full-stack SaaS platform for gym owners to manage members, staff, payments, and analytics.
 
 - [![Live App](https://img.shields.io/badge/Live%20App-Render-46E3B7?logo=render)](https://fitsync-frontend-zcz8.onrender.com)
 
