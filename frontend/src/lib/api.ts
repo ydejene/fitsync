@@ -1,25 +1,20 @@
 // src/lib/api.ts
 // Client-side fetch helper — safe to import from "use client" components
 
-const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-
 /**
- * Client-side fetch — sends credentials: "include" so the browser
- * attaches the httpOnly cookie automatically.
+ * Client-side fetch — routes through the Next.js proxy at /api/proxy
+ * so the server-side fitsync_token cookie is forwarded to the backend.
  * Use this in "use client" components.
  */
 export function clientFetch<T = any>(
   path: string,
   init?: RequestInit
 ): Promise<{ success: boolean; data: T; message?: string }> {
-  return fetch(`${API_BASE}${path}`, {
+  return fetch(`/api/proxy${path}`, {
     ...init,
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...init?.headers,
     },
   }).then((res) => res.json());
 }
-
-export { API_BASE };
