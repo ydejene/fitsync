@@ -95,15 +95,18 @@ function ChartCard({ title, children, className = "" }: { title: string; childre
 function KpiCard({ label, value, icon, color, subtext }: {
   label: string; value: string; icon: string; color: string; subtext?: string;
 }) {
+  // Flex layout vertically so the text gets the full width of the card
   return (
-    <div className="bg-white p-4 rounded-2xl border border-[#E5E5E5] shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow min-w-0">
-      <div className={`rounded-xl p-2.5 shrink-0 ${color}`}>
-        <i className={`fa-solid ${icon} text-base`} />
+    <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5E5E5] shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow h-full">
+      <div className="flex items-start justify-between gap-2 mb-3">
+        <p className="text-xs font-medium text-gray-500">{label}</p>
+        <div className={`rounded-xl p-2 shrink-0 ${color}`}>
+          <i className={`fa-solid ${icon} text-sm`} />
+        </div>
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-lg sm:text-xl font-bold text-gray-900 leading-tight break-all">{value}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{label}</p>
-        {subtext && <p className="text-[10px] text-gray-400 mt-0.5">{subtext}</p>}
+      <div className="mt-auto">
+        <p className="text-lg sm:text-xl font-bold text-gray-900 leading-tight break-words">{value}</p>
+        {subtext && <p className="text-[10px] text-gray-400 mt-1">{subtext}</p>}
       </div>
     </div>
   );
