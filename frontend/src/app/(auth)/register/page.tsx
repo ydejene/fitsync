@@ -145,7 +145,7 @@ export default function RegisterPage() {
         phone: `+251${form.phone}`
       };
 
-      const res = await fetch(`${BACKEND_URL}/api/auth/register`, {
+      const res = await fetch(`/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

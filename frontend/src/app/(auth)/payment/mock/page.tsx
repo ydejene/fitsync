@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { clientFetch } from "@/lib/api";
 
 function MockPaymentContent() {
   const router = useRouter();
@@ -63,10 +62,11 @@ function MockPaymentContent() {
 
     setLoading(true);
     try {
-      const res = await clientFetch("/api/telebirr/mock-payment", {
+      const res = await fetch("/api/telebirr/mock-payment", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ merchOrderId }),
-      });
+      }).then((r) => r.json());
 
       if (res.success) {
         sessionStorage.setItem("fitsync_merch_order_id", merchOrderId);
