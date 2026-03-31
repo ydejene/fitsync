@@ -12,7 +12,7 @@
 
 ## Demo
 
-> 📹 **[Watch Demo Video](https://youtu.be/t3iL6IqruNU)** ← replace with actual link before submission
+> 📹 **[Watch Demo Video](https://youtu.be/t3iL6IqruNU)**
 
 ---
 
